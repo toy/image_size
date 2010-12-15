@@ -11,7 +11,7 @@ begin
     gem.summary = %Q{measure image size using pure Ruby}
     gem.description = %Q{measure following file dimensions: PCX, PSD, XPM, TIFF, XBM, PGM, PBM, PPM, BMP, JPEG, PNG, GIF, SWF}
     gem.homepage = "http://github.com/toy/#{name}"
-    gem.authors = ['Keisuke Minami', 'Boba Fat']
+    gem.authors = ['Keisuke Minami', 'Ivan Kuchin']
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
