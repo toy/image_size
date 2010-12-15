@@ -1,5 +1,11 @@
-.DS_Store
-pkg
-doc
-*.gem
-*.swp
+/pkg/
+
+/doc/
+/rdoc/
+/.yardoc/
+/coverage/
+
+Makefile
+*.o
+*.bundle
+/tmp/
