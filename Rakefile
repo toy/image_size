@@ -10,7 +10,7 @@ Jeweler::Tasks.new do |gem|
   gem.description = %Q{Measure following file dimensions: PCX, PSD, XPM, TIFF, XBM, PGM, PBM, PPM, BMP, JPEG, PNG, GIF, SWF}
   gem.homepage = "http://github.com/toy/#{name}"
   gem.license = 'MIT'
-  gem.authors = ['Ivan Kuchin']
+  gem.authors = ['Keisuke Minami', 'Ivan Kuchin']
   gem.add_development_dependency 'jeweler', '~> 1.5.1'
   gem.add_development_dependency 'rake-gem-ghost'
 end
