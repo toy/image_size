@@ -13,9 +13,9 @@ The latest version of image\_size can be found at http://github.com/toy/image_si
 
 ## Simple Example
 
-    ruby "rubygems" # you use rubygems
     ruby "image_size"
     ruby "open-uri"
+
     open("http://www.rubycgi.org/image/ruby_gtk_book_title.jpg", "rb") do |fh|
       p ImageSize.new(fh.read).size
     end
