@@ -5,10 +5,10 @@
 
 Gem::Specification.new do |s|
   s.name = %q{image_size}
-  s.version = "1.0.1"
+  s.version = "1.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Ivan Kuchin"]
+  s.authors = ["Keisuke Minami", "Ivan Kuchin"]
   s.date = %q{2010-12-15}
   s.description = %q{Measure following file dimensions: PCX, PSD, XPM, TIFF, XBM, PGM, PBM, PPM, BMP, JPEG, PNG, GIF, SWF}
   s.extra_rdoc_files = [
