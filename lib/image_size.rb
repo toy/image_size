@@ -80,8 +80,8 @@ private
     when img_top[0, 4] == "II\x2a\x00"              then :tiff
     when img_top =~ /\/\* XPM \*\//                 then :xpm
     when img_top[0, 4] == '8BPS'                    then :psd
-    when img_top[0] == 10                           then :pcx
     when img_top =~ /^[FC]WS/                       then :swf
+    when img_top[0, 1] == "\x0a"                    then :pcx
     end
   end
 
