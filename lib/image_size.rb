@@ -14,9 +14,6 @@ class ImageSize
   # argument is image String, StringIO or IO
   def initialize(data)
     @data = data.dup
-    @width  = nil
-    @height = nil
-    @format = nil
 
     if @data.is_a?(IO)
       img_top = @data.read(1024)
