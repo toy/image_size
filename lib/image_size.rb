@@ -80,8 +80,8 @@ private
     when img_top[0, 4] == "II\x2a\x00"              then :tiff
     when img_top =~ /\/\* XPM \*\//                 then :xpm
     when img_top[0, 4] == '8BPS'                    then :psd
-    when img_top[1, 2] == 'WS'                      then :swf
     when img_top[0] == 10                           then :pcx
+    when img_top =~ /^[FC]WS/                       then :swf
     end
   end
 
@@ -208,10 +208,6 @@ private
     sig1 = header[0, 1]
     sig2 = header[1, 1]
     sig3 = header[2, 1]
-
-    unless ((sig1 == 'F' || sig1 == 'C') && sig2 == 'W' && sig3 == 'S')
-      raise 'This file is not SWF.'
-    end
 
     bit_length = Integer("0b#{header.unpack('@8B5')}")
     header << img_io.read_o(bit_length * 4 / 8 + 1)
