@@ -209,7 +209,7 @@ private
     sig2 = header[1, 1]
     sig3 = header[2, 1]
 
-    bit_length = Integer("0b#{header.unpack('@8B5')}")
+    bit_length = Integer("0b#{header.unpack('@8B5').first}")
     header << img_io.read_o(bit_length * 4 / 8 + 1)
     str = header.unpack("@8B#{5 + bit_length * 4}")[0]
     last = 5
