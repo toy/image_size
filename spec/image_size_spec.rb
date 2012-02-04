@@ -27,6 +27,13 @@ describe ImageSize do
       end
     end
 
+    it "should get format and dimensions for #{name} given StringIO" do
+      File.open(path, 'rb') do |fh|
+        is = ImageSize.new(StringIO.new(fh.read))
+        [is.format, is.width, is.height].should == [format, width, height]
+      end
+    end
+
     it "should get format and dimensions for #{name} given file data" do
       File.open(path, 'rb') do |fh|
         is = ImageSize.new(fh.read)
