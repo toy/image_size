@@ -1,13 +1,6 @@
 require 'stringio'
 
 class ImageSize
-  JpegCodeCheck = [
-    "\xc0", "\xc1", "\xc2", "\xc3",
-    "\xc5", "\xc6", "\xc7",
-    "\xc9", "\xca", "\xcb",
-    "\xcd", "\xce", "\xcf",
-  ]
-
   attr_reader :format, :width, :height
 
   # receive image & make size
@@ -15,18 +8,16 @@ class ImageSize
   def initialize(data)
     @data = data.dup
 
-    if @data.is_a?(IO)
+    case @data
+    when IO, StringIO
       img_top = @data.read(1024)
       img_io = def_read_o(@data)
-    elsif @data.is_a?(StringIO)
-      img_top = @data.read(1024)
-      img_io = def_read_o(@data)
-    elsif @data.is_a?(String)
+    when String
       img_top = @data[0, 1024]
       img_io = StringIO.open(@data)
       img_io = def_read_o(img_io)
     else
-      raise "argument class error!! #{data.class}"
+      raise ArgumentError.new("expected instance of IO, StringIO or String, got #{@data.class}")
     end
 
     if @format = check_format(img_top)
@@ -96,6 +87,12 @@ private
     img_io.read_o(8).unpack('NN')
   end
 
+  JpegCodeCheck = [
+    "\xc0", "\xc1", "\xc2", "\xc3",
+    "\xc5", "\xc6", "\xc7",
+    "\xc9", "\xca", "\xcb",
+    "\xcd", "\xce", "\xcf",
+  ]
   def measure_jpeg(img_io)
     c_marker = "\xFF"   # Section marker.
     img_io.read_o(2)
