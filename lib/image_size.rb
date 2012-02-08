@@ -6,25 +6,25 @@ class ImageSize
   # receive image & make size
   # argument is image String, StringIO or IO
   def initialize(data)
-    @data = data.dup
+    data = data.dup
 
-    case @data
+    case data
     when IO, StringIO
-      img_top = @data.read(1024)
-      img_io = def_read_o(@data)
+      img_top = data.read(1024)
+      img_io = def_read_o(data)
     when String
-      img_top = @data[0, 1024]
-      img_io = StringIO.open(@data)
+      img_top = data[0, 1024]
+      img_io = StringIO.open(data)
       img_io = def_read_o(img_io)
     else
-      raise ArgumentError.new("expected instance of IO, StringIO or String, got #{@data.class}")
+      raise ArgumentError.new("expected instance of IO, StringIO or String, got #{data.class}")
     end
 
     if @format = check_format(img_top)
       @width, @height = self.send("measure_#{@format}", img_io)
     end
 
-    if @data.is_a?(String)
+    if data.is_a?(String)
       img_io.close
     end
   end
