@@ -1,4 +1,5 @@
 require 'stringio'
+require 'tempfile'
 
 class ImageSize
   attr_reader :format, :width, :height
@@ -9,7 +10,8 @@ class ImageSize
     data = data.dup
 
     case data
-    when IO, StringIO
+    when IO, StringIO, Tempfile
+      data.rewind
       img_top = data.read(1024)
       img_io = def_read_o(data)
     when String
