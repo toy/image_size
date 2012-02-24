@@ -3,19 +3,18 @@ require 'tempfile'
 
 class ImageSize
   class Size < Array
+    # join with 'x'
     def to_s
       join('x')
     end
   end
 
+  # Given path to image finds its format, width and height
   def self.path(path)
     open(path, 'rb'){ |f| new(f) }
   end
 
-  attr_reader :format, :width, :height
-
-  # receive image & make size
-  # argument is image String, StringIO or IO
+  # Given image as IO, StringIO, Tempfile or String finds its format and dimensions
   def initialize(data)
     data = data.dup
 
@@ -41,15 +40,23 @@ class ImageSize
     end
   end
 
+  # Image format
+  attr_reader :format
+
+  # Image width
+  attr_reader :width
+  alias :w :width
+
+  # Image height
+  attr_reader :height
+  alias :h :height
+
   # get image width and height as an array which to_s method returns "#{width}x#{height}"
   def size
     if format
       Size.new([width, height])
     end
   end
-
-  alias :h :height
-  alias :w :width
 
 private
 
