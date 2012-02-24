@@ -122,7 +122,7 @@ private
   end
 
   def measure_bmp(img_io)
-    img_io.read_o(26).unpack('x18VV');
+    img_io.read_o(26).unpack('x18VV')
   end
 
   def measure_ppm(img_io)
@@ -150,7 +150,7 @@ private
     width = height = nil
     while(line = img_io.read_o(1024))
       if line =~ /"\s*(\d+)\s+(\d+)(\s+\d+\s+\d+){1,2}\s*"/m
-        width = $1.to_i; height = $2.to_i
+        width, height = $1.to_i, $2.to_i
         break
       end
     end
@@ -183,7 +183,7 @@ private
     ifd = img_io.read_o(2, offset)
     num_dirent = ifd.unpack(endian)[0]                   # Make it useful
     offset += 2
-    num_dirent = offset + (num_dirent * 12);             # Calc. maximum offset of IFD
+    num_dirent = offset + (num_dirent * 12)             # Calc. maximum offset of IFD
 
     ifd = width = height = nil
     while(width.nil? || height.nil?)
