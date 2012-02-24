@@ -3,7 +3,7 @@ require 'tempfile'
 
 class ImageSize
   class Size < Array
-    # join with 'x'
+    # join using 'x'
     def to_s
       join('x')
     end
