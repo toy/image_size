@@ -1,7 +1,6 @@
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 require 'rspec'
 require 'image_size'
-require 'tempfile'
 
 describe ImageSize do
   [
