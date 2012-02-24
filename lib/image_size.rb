@@ -19,7 +19,7 @@ class ImageSize
       img_io = StringIO.open(data)
       img_io = def_read_o(img_io)
     else
-      raise ArgumentError.new("expected instance of IO, StringIO or String, got #{data.class}")
+      raise ArgumentError.new("expected instance of IO, StringIO, Tempfile or String, got #{data.class}")
     end
 
     if @format = check_format(img_top)
