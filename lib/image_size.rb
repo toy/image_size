@@ -219,14 +219,14 @@ private
     sig2 = header[1, 1]
     sig3 = header[2, 1]
 
-    bit_length = Integer("0b#{header.unpack('@8B5').first}")
+    bit_length = header.unpack('@8B5').first.to_i(2)
     header << img_io.read_o(bit_length * 4 / 8 + 1)
     str = header.unpack("@8B#{5 + bit_length * 4}")[0]
     last = 5
-    x_min = Integer("0b#{str[last, bit_length]}")
-    x_max = Integer("0b#{str[(last += bit_length), bit_length]}")
-    y_min = Integer("0b#{str[(last += bit_length), bit_length]}")
-    y_max = Integer("0b#{str[(last += bit_length), bit_length]}")
+    x_min = str[last, bit_length].to_i(2)
+    x_max = str[(last += bit_length), bit_length].to_i(2)
+    y_min = str[(last += bit_length), bit_length].to_i(2)
+    y_max = str[(last += bit_length), bit_length].to_i(2)
 
     [(x_max - x_min) / 20, (y_max - y_min) / 20]
   end
