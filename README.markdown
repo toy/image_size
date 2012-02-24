@@ -1,7 +1,7 @@
 # image_size
 
 measure image size using pure Ruby
-formats: PCX, PSD, XPM, TIFF, XBM, PGM, PBM, PPM, BMP, JPEG, PNG, GIF, SWF
+formats: `bmp`, `gif`, `jpeg`, `pbm`, `pcx`, `pgm`, `png`, `ppm`, `psd`, `swf`, `tiff`, `xbm`, `xpm`
 
 ## Download
 
