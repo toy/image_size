@@ -2,6 +2,12 @@ require 'stringio'
 require 'tempfile'
 
 class ImageSize
+  class Size < Array
+    def to_s
+      join('x')
+    end
+  end
+
   def self.path(path)
     open(path, 'rb'){ |f| new(f) }
   end
@@ -38,11 +44,7 @@ class ImageSize
   # get image width and height as an array which to_s method returns "#{width}x#{height}"
   def size
     if format
-      size = [width, height]
-      def size.to_s
-        join('x')
-      end
-      size
+      Size.new([width, height])
     end
   end
 
