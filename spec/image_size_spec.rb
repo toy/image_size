@@ -59,5 +59,10 @@ describe ImageSize do
         [is.format, is.width, is.height].should == [format, width, height]
       end
     end
+
+    it "should get format and dimensions for #{name} as path" do
+      is = ImageSize.path(path)
+      [is.format, is.width, is.height].should == [format, width, height]
+    end
   end
 end

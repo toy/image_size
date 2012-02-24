@@ -11,13 +11,27 @@ The latest version of image\_size can be found at http://github.com/toy/image_si
 
     gem install image_size
 
-## Simple Example
+## Examples
 
-    ruby "image_size"
-    ruby "open-uri"
+    require 'image_size'
 
-    open("http://www.rubycgi.org/image/ruby_gtk_book_title.jpg", "rb") do |fh|
-      p ImageSize.new(fh.read).size
+    p ImageSize.path('spec/test.jpg').size
+
+    open('spec/test.jpg', 'rb') do |fh|
+      p ImageSize.new(fh).size
+    end
+
+
+    require 'image_size'
+    require 'open-uri'
+
+    open('http://www.rubycgi.org/image/ruby_gtk_book_title.jpg', 'rb') do |fh|
+      p ImageSize.new(fh).size
+    end
+
+    open('http://www.rubycgi.org/image/ruby_gtk_book_title.jpg', 'rb') do |fh|
+      data = fh.read
+      p ImageSize.new(data).size
     end
 
 ## Licence

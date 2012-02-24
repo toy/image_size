@@ -2,6 +2,10 @@ require 'stringio'
 require 'tempfile'
 
 class ImageSize
+  def self.path(path)
+    open(path, 'rb'){ |f| new(f) }
+  end
+
   attr_reader :format, :width, :height
 
   # receive image & make size
