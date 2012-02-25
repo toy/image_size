@@ -9,6 +9,36 @@ class ImageSize
     end
   end
 
+  class ImageReader
+    def initialize(data_or_io)
+      @io = case data_or_io
+      when IO, StringIO, Tempfile
+        data_or_io.dup.tap(&:rewind)
+      when String
+        StringIO.new(data_or_io)
+      else
+        raise ArgumentError.new("expected instance of IO, StringIO, Tempfile or String, got #{data.class}")
+      end
+      @read = 0
+      @data = ''
+    end
+
+    def rewind
+      @io.rewind
+    end
+
+    CHUNK = 1024
+    def [](offset, length)
+      while offset + length > @read
+        @read += CHUNK
+        if data = @io.read(CHUNK)
+          @data << data
+        end
+      end
+      @data[offset, length]
+    end
+  end
+
   # Given path to image finds its format, width and height
   def self.path(path)
     open(path, 'rb'){ |f| new(f) }
@@ -16,28 +46,11 @@ class ImageSize
 
   # Given image as IO, StringIO, Tempfile or String finds its format and dimensions
   def initialize(data)
-    data = data.dup
-
-    case data
-    when IO, StringIO, Tempfile
-      data.rewind
-      img_top = data.read(1024)
-      img_io = def_read_o(data)
-    when String
-      img_top = data[0, 1024]
-      img_io = StringIO.open(data)
-      img_io = def_read_o(img_io)
-    else
-      raise ArgumentError.new("expected instance of IO, StringIO, Tempfile or String, got #{data.class}")
+    ir = ImageReader.new(data)
+    if @format = detect_format(ir)
+      @width, @height = self.send("size_of_#{@format}", ir)
     end
-
-    if @format = check_format(img_top)
-      @width, @height = self.send("measure_#{@format}", img_io)
-    end
-
-    if data.is_a?(String)
-      img_io.close
-    end
+    ir.rewind
   end
 
   # Image format
@@ -60,44 +73,33 @@ class ImageSize
 
 private
 
-  def def_read_o(io)
-    io.seek(0, 0)
-    # define Singleton-method definition to IO (byte, offset)
-    def io.read_o(length = 1, offset = nil)
-      self.seek(offset, 0) if offset
-      ret = self.read(length)
-      raise 'cannot read!!' unless ret
-      ret
-    end
-    io
-  end
-
-  def check_format(img_top)
+  def detect_format(ir)
+    head = ir[0, 1024]
     case
-    when img_top =~ /^GIF8[7,9]a/                   then :gif
-    when img_top[0, 8] == "\x89PNG\x0d\x0a\x1a\x0a" then :png
-    when img_top[0, 2] == "\xFF\xD8"                then :jpeg
-    when img_top[0, 2] == 'BM'                      then :bmp
-    when img_top =~ /^P[1-7]/                       then :ppm
-    when img_top =~ /\#define\s+\S+\s+\d+/          then :xbm
-    when img_top[0, 4] == "II\x2a\x00"              then :tiff
-    when img_top[0, 4] == "MM\x00\x2a"              then :tiff
-    when img_top =~ /\/\* XPM \*\//                 then :xpm
-    when img_top[0, 4] == '8BPS'                    then :psd
-    when img_top =~ /^[FC]WS/                       then :swf
-    when img_top[0, 1] == "\x0a"                    then :pcx
+    when head =~ /^GIF8[7,9]a/              then :gif
+    when head[0, 8] == "\211PNG\r\n\032\n"  then :png
+    when head[0, 2] == "\377\330"           then :jpeg
+    when head[0, 2] == 'BM'                 then :bmp
+    when head =~ /^P[1-7]/                  then :ppm
+    when head =~ /\#define\s+\S+\s+\d+/     then :xbm
+    when head[0, 4] == "II*\000"            then :tiff
+    when head[0, 4] == "MM\000*"            then :tiff
+    when head =~ /\/\* XPM \*\//            then :xpm
+    when head[0, 4] == '8BPS'               then :psd
+    when head =~ /^[FC]WS/                  then :swf
+    when head[0, 1] == "\n"                 then :pcx
     end
   end
 
-  def measure_gif(img_io)
-    img_io.read_o(6)
-    img_io.read_o(4).unpack('vv')
+  def size_of_gif(ir)
+    ir[6, 4].unpack('vv')
   end
 
-  def measure_png(img_io)
-    img_io.read_o(12)
-    raise 'This file is not PNG.' unless img_io.read_o(4) == 'IHDR'
-    img_io.read_o(8).unpack('NN')
+  def size_of_png(ir)
+    unless ir[12, 4] == 'IHDR'
+      raise 'IHDR not in place for PNG'
+    end
+    ir[16, 8].unpack('NN')
   end
 
   JpegCodeCheck = [
@@ -106,128 +108,97 @@ private
     "\xc9", "\xca", "\xcb",
     "\xcd", "\xce", "\xcf",
   ]
-  def measure_jpeg(img_io)
-    c_marker = "\xFF"   # Section marker.
-    img_io.read_o(2)
+  def size_of_jpeg(ir)
+    section_marker = "\xFF"
+    offset = 2
     loop do
-      marker, code, length = img_io.read_o(4).unpack('aan')
-      raise 'JPEG marker not found!' if marker != c_marker
+      marker, code, length = ir[offset, 4].unpack('aan')
+      offset += 4
+      raise 'JPEG marker not found' if marker != section_marker
 
       if JpegCodeCheck.include?(code)
-        height, width = img_io.read_o(5).unpack('xnn')
-        return [width, height]
+        return ir[offset + 1, 4].unpack('nn').reverse
       end
-      img_io.read_o(length - 2)
+      offset += length - 2
     end
   end
 
-  def measure_bmp(img_io)
-    img_io.read_o(26).unpack('x18VV')
+  def size_of_bmp(ir)
+    ir[18, 8].unpack('VV')
   end
 
-  def measure_ppm(img_io)
-    header = img_io.read_o(1024)
+  def size_of_ppm(ir)
+    header = ir[0, 1024]
     header.gsub!(/^\#[^\n\r]*/m, '')
     header =~ /^(P[1-6])\s+?(\d+)\s+?(\d+)/m
     case $1
       when 'P1', 'P4' then @format = :pbm
       when 'P2', 'P5' then @format = :pgm
     end
-
     [$2.to_i, $3.to_i]
   end
 
-  alias :measure_pgm :measure_ppm
-  alias :measure_pbm :measure_ppm
-
-  def measure_xbm(img_io)
-    img_io.read_o(1024) =~ /^\#define\s*\S*\s*(\d+)\s*\n\#define\s*\S*\s*(\d+)/mi
-
+  def size_of_xbm(ir)
+    ir[0, 1024] =~ /^\#define\s*\S*\s*(\d+)\s*\n\#define\s*\S*\s*(\d+)/mi
     [$1.to_i, $2.to_i]
   end
 
-  def measure_xpm(img_io)
-    width = height = nil
-    while(line = img_io.read_o(1024))
-      if line =~ /"\s*(\d+)\s+(\d+)(\s+\d+\s+\d+){1,2}\s*"/m
-        width, height = $1.to_i, $2.to_i
-        break
+  def size_of_xpm(ir)
+    length = 1024
+    until (data = ir[0, length]) =~ /"\s*(\d+)\s+(\d+)(\s+\d+\s+\d+){1,2}\s*"/m
+      if data.length != length
+        raise 'XPM size not found'
       end
+      length += 1024
     end
-
-    [width, height]
+    [$1.to_i, $2.to_i]
   end
 
-  def measure_psd(img_io)
-    img_io.read_o(26).unpack('x14NN')
+  def size_of_psd(ir)
+    ir[14, 8].unpack('NN')
   end
 
-  def measure_tiff(img_io)
-    endian = (img_io.read_o(4) =~ /II\x2a\x00/o) ? 'v' : 'n' # 'v' little-endian   'n' default to big-endian
+  def size_of_tiff(ir)
+    endian2b = (ir[0, 4] == "II*\000") ? 'v' : 'n'
+    endian4b = endian2b.upcase
+    packspec = [nil, 'C', nil, endian2b, endian4b, nil, 'c', nil, endian2b, endian4b]
 
-    packspec = [
-      nil,           # nothing (shouldn't happen)
-      'C',           # BYTE (8-bit unsigned integer)
-      nil,           # ASCII
-      endian,        # SHORT (16-bit unsigned integer)
-      endian.upcase, # LONG (32-bit unsigned integer)
-      nil,           # RATIONAL
-      'c',           # SBYTE (8-bit signed integer)
-      nil,           # UNDEFINED
-      endian,        # SSHORT (16-bit unsigned integer)
-      endian.upcase, # SLONG (32-bit unsigned integer)
-    ]
-
-    offset = img_io.read_o(4).unpack(endian.upcase)[0] # Get offset to IFD
-
-    ifd = img_io.read_o(2, offset)
-    num_dirent = ifd.unpack(endian)[0]                   # Make it useful
+    offset = ir[4, 4].unpack(endian4b)[0]
+    num_dirent = ir[offset, 2].unpack(endian2b)[0]
     offset += 2
-    num_dirent = offset + (num_dirent * 12)             # Calc. maximum offset of IFD
+    num_dirent = offset + (num_dirent * 12)
 
-    ifd = width = height = nil
-    while(width.nil? || height.nil?)
-      ifd = img_io.read_o(12, offset)                 # Get first directory entry
-      break if (ifd.nil? || (offset > num_dirent))
+    width = height = nil
+    until width && height
+      ifd = ir[offset, 12]
+      raise 'Reached end of directory entries in TIFF' if ifd.nil? || offset > num_dirent
+      tag, type = ifd.unpack(endian2b * 2)
       offset += 12
-      tag = ifd.unpack(endian)[0]                       # ...and decode its tag
-      type = ifd[2, 2].unpack(endian)[0]                # ...and the data type
 
-      # Check the type for sanity.
-      next if (type > packspec.size + 0) || (packspec[type].nil?)
-      if tag == 0x0100                                  # Decode the value
-        width = ifd[8, 4].unpack(packspec[type])[0]
-      elsif tag == 0x0101                               # Decode the value
-        height = ifd[8, 4].unpack(packspec[type])[0]
+      unless packspec[type].nil?
+        value = ifd[8, 4].unpack(packspec[type])[0]
+        case tag
+        when 0x0100
+          width = value
+        when 0x0101
+          height = value
+        end
       end
     end
-
     [width, height]
   end
 
-  def measure_pcx(img_io)
-    header = img_io.read_o(128)
-    head_part = header.unpack('C4S4')
-
-    [head_part[6] - head_part[4] + 1, head_part[7] - head_part[5] + 1]
+  def size_of_pcx(ir)
+    parts = ir[4, 8].unpack('S4')
+    [parts[2] - parts[0] + 1, parts[3] - parts[1] + 1]
   end
 
-  def measure_swf(img_io)
-    header = img_io.read_o(9)
-
-    sig1 = header[0, 1]
-    sig2 = header[1, 1]
-    sig3 = header[2, 1]
-
-    bit_length = header.unpack('@8B5').first.to_i(2)
-    header << img_io.read_o(bit_length * 4 / 8 + 1)
-    str = header.unpack("@8B#{5 + bit_length * 4}")[0]
-    last = 5
-    x_min = str[last, bit_length].to_i(2)
-    x_max = str[(last += bit_length), bit_length].to_i(2)
-    y_min = str[(last += bit_length), bit_length].to_i(2)
-    y_max = str[(last += bit_length), bit_length].to_i(2)
-
+  def size_of_swf(ir)
+    value_bit_length = ir[8, 1].unpack('B5').first.to_i(2)
+    bit_length = 5 + value_bit_length * 4
+    rect_bits = ir[8, bit_length / 8 + 1].unpack("B#{bit_length}").first
+    values = rect_bits.unpack('@5' + "a#{value_bit_length}" * 4).map{ |bits| bits.to_i(2) }
+    x_min, x_max, y_min, y_max = values
     [(x_max - x_min) / 20, (y_max - y_min) / 20]
   end
 end
