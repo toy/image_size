@@ -45,6 +45,7 @@ describe ImageSize do
       file_data = File.open(path, 'rb') { |fh| fh.read }
       Tempfile.open(name) do |tf|
         tf.write(file_data)
+        tf.rewind
         is = ImageSize.new(tf)
         [is.format, is.width, is.height].should == [format, width, height]
       end
