@@ -9,7 +9,7 @@ class ImageSize
     end
   end
 
-  class ImageReader
+  class ImageReader # :nodoc:
     def initialize(data_or_io)
       @io = case data_or_io
       when IO, StringIO, Tempfile
@@ -107,7 +107,7 @@ private
     "\xc5", "\xc6", "\xc7",
     "\xc9", "\xca", "\xcb",
     "\xcd", "\xce", "\xcf",
-  ]
+  ] # :nodoc:
   def size_of_jpeg(ir)
     section_marker = "\xFF"
     offset = 2
