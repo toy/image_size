@@ -20,7 +20,7 @@ describe ImageSize do
   ].each do |name, format, width, height|
     path = File.join(File.dirname(__FILE__), name)
 
-    it "should get format and dimensions for #{name} given io" do
+    it "should get format and dimensions for #{name} given IO" do
       File.open(path, 'rb') do |fh|
         is = ImageSize.new(fh)
         [is.format, is.width, is.height].should == [format, width, height]
@@ -50,7 +50,7 @@ describe ImageSize do
       end
     end
 
-    it "should get format and dimensions for #{name} given io when run twice" do
+    it "should get format and dimensions for #{name} given IO when run twice" do
       File.open(path, 'rb') do |fh|
         is = ImageSize.new(fh)
         [is.format, is.width, is.height].should == [format, width, height]
