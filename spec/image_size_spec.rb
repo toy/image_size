@@ -65,4 +65,10 @@ describe ImageSize do
       [is.format, is.width, is.height].should == [format, width, height]
     end
   end
+
+  it "should raise ArgumentError if argument is not valid" do
+    lambda {
+      ImageSize.new(Object)
+    }.should raise_error(ArgumentError)
+  end
 end
