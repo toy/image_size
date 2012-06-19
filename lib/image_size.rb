@@ -17,7 +17,7 @@ class ImageSize
       when String
         StringIO.new(data_or_io)
       else
-        raise ArgumentError.new("expected instance of IO, StringIO, Tempfile or String, got #{data.class}")
+        raise ArgumentError.new("expected instance of IO, StringIO, Tempfile or String, got #{data_or_io.class}")
       end
       @read = 0
       @data = ''
