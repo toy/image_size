@@ -1,3 +1,5 @@
+# -- coding: ASCII-8BIT --
+#
 require 'stringio'
 require 'tempfile'
 
