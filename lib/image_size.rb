@@ -34,6 +34,9 @@ class ImageSize
       while offset + length > @read
         @read += CHUNK
         if data = @io.read(CHUNK)
+          if data.respond_to?(:encoding)
+            data.force_encoding(@data.encoding)
+          end
           @data << data
         end
       end
