@@ -27,7 +27,7 @@ class ImageSize
 
     def close
       @io.rewind
-      @io.close unless Tempfile === @io
+      @io.close if IO === @io
     end
 
     CHUNK = 1024
