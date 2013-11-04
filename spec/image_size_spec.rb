@@ -25,6 +25,8 @@ describe ImageSize do
       File.open(path, 'rb') do |fh|
         is = ImageSize.new(fh)
         [is.format, is.width, is.height].should == [format, width, height]
+        fh.should_not be_closed
+        fh.rewind
         fh.read.should == file_data
       end
     end
@@ -33,6 +35,8 @@ describe ImageSize do
       io = StringIO.new(file_data)
       is = ImageSize.new(io)
       [is.format, is.width, is.height].should == [format, width, height]
+      io.should_not be_closed
+      io.rewind
       io.read.should == file_data
     end
 
@@ -48,6 +52,8 @@ describe ImageSize do
         tf.rewind
         is = ImageSize.new(tf)
         [is.format, is.width, is.height].should == [format, width, height]
+        tf.should_not be_closed
+        tf.rewind
         tf.read.should == file_data
       end
     end
