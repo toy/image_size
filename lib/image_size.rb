@@ -25,8 +25,9 @@ class ImageSize
       @data = ''
     end
 
-    def rewind
+    def close
       @io.rewind
+      @io.close unless Tempfile === @io
     end
 
     CHUNK = 1024
@@ -55,7 +56,7 @@ class ImageSize
     if @format = detect_format(ir)
       @width, @height = self.send("size_of_#{@format}", ir)
     end
-    ir.rewind
+    ir.close
   end
 
   # Image format
