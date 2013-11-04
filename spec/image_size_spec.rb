@@ -19,35 +19,42 @@ describe ImageSize do
     ['image_size_spec.rb', nil, nil, nil],
   ].each do |name, format, width, height|
     path = File.join(File.dirname(__FILE__), name)
+    file_data = File.open(path, 'rb', &:read)
 
     it "should get format and dimensions for #{name} given IO" do
       File.open(path, 'rb') do |fh|
         is = ImageSize.new(fh)
         [is.format, is.width, is.height].should == [format, width, height]
+        fh.should_not be_closed
+        fh.rewind
+        fh.read.should == file_data
       end
     end
 
     it "should get format and dimensions for #{name} given StringIO" do
-      File.open(path, 'rb') do |fh|
-        is = ImageSize.new(StringIO.new(fh.read))
-        [is.format, is.width, is.height].should == [format, width, height]
-      end
+      io = StringIO.new(file_data)
+      is = ImageSize.new(io)
+      [is.format, is.width, is.height].should == [format, width, height]
+      io.should_not be_closed
+      io.rewind
+      io.read.should == file_data
     end
 
     it "should get format and dimensions for #{name} given file data" do
-      File.open(path, 'rb') do |fh|
-        is = ImageSize.new(fh.read)
-        [is.format, is.width, is.height].should == [format, width, height]
-      end
+      is = ImageSize.new(file_data)
+      [is.format, is.width, is.height].should == [format, width, height]
     end
 
     it "should get format and dimensions for #{name} given Tempfile" do
-      file_data = File.open(path, 'rb') { |fh| fh.read }
       Tempfile.open(name) do |tf|
+        tf.binmode
         tf.write(file_data)
         tf.rewind
         is = ImageSize.new(tf)
         [is.format, is.width, is.height].should == [format, width, height]
+        tf.should_not be_closed
+        tf.rewind
+        tf.read.should == file_data
       end
     end
 
