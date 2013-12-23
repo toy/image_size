@@ -130,7 +130,12 @@ private
   end
 
   def size_of_bmp(ir)
-    ir[18, 8].unpack('VV')
+    header_size = ir[14, 4].unpack('V')[0]
+    if header_size == 12
+      ir[18, 4].unpack('vv')
+    else
+      ir[18, 8].unpack('VV')
+    end
   end
 
   def size_of_ppm(ir)
