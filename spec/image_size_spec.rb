@@ -4,18 +4,18 @@ require 'image_size'
 
 describe ImageSize do
   [
-    ['test.bmp',  :bmp,  50,  50],
+    ['test.bmp',  :bmp,  42,  50],
     ['test.gif',  :gif, 668, 481],
     ['test.jpg', :jpeg, 320, 240],
     ['test.pbm',  :pbm,  85,  55],
     ['test.pcx',  :pcx,  70,  60],
     ['test.pgm',  :pgm,  90,  55],
     ['test.png',  :png, 640, 532],
-    ['test.psd',  :psd,  20,  20],
+    ['test.psd',  :psd,  16,  20],
     ['test.swf',  :swf, 450, 200],
-    ['test.tif', :tiff,  64,  64],
-    ['test.xbm',  :xbm,  16,  16],
-    ['test.xpm',  :xpm,  32,  32],
+    ['test.tif', :tiff,  48,  64],
+    ['test.xbm',  :xbm,  16,  32],
+    ['test.xpm',  :xpm,  24,  32],
     ['image_size_spec.rb', nil, nil, nil],
   ].each do |name, format, width, height|
     path = File.join(File.dirname(__FILE__), name)
