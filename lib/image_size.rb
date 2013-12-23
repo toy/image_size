@@ -161,7 +161,7 @@ private
   end
 
   def size_of_psd(ir)
-    ir[14, 8].unpack('NN')
+    ir[14, 8].unpack('NN').reverse
   end
 
   def size_of_tiff(ir)
