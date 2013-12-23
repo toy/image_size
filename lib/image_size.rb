@@ -134,7 +134,13 @@ private
     if header_size == 12
       ir[18, 4].unpack('vv')
     else
-      ir[18, 8].unpack('VV')
+      ir[18, 8].unpack('VV').map do |n|
+        if n > 0x7fff_ffff
+          0x1_0000_0000 - n # absolute value of converted to signed
+        else
+          n
+        end
+      end
     end
   end
 

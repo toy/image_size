@@ -5,7 +5,8 @@ require 'image_size'
 describe ImageSize do
   [
     ['test2.bmp', :bmp,  42,  50],
-    ['test3.bmp', :bmp,  42,  50],
+    ['test3b.bmp',:bmp,  42,  50],
+    ['test3t.bmp',:bmp,  42,  50],
     ['test.gif',  :gif, 668, 481],
     ['test.jpg', :jpeg, 320, 240],
     ['test.pbm',  :pbm,  85,  55],
