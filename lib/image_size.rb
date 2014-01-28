@@ -93,7 +93,7 @@ private
     when head =~ /\/\* XPM \*\//            then :xpm
     when head[0, 4] == '8BPS'               then :psd
     when head =~ /^[FC]WS/                  then :swf
-    when head[0, 1] == "\n"                 then :pcx
+    when head[0, 2] =~ /\n[\000-\005]/      then :pcx
     end
   end
 
