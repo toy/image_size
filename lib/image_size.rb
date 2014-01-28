@@ -12,6 +12,7 @@ class ImageSize
   end
 
   class ImageReader # :nodoc:
+    attr_reader :data
     def initialize(data_or_io)
       @io = case data_or_io
       when IO, StringIO, Tempfile
@@ -50,6 +51,16 @@ class ImageSize
     open(path, 'rb'){ |f| new(f) }
   end
 
+  # Used for svg
+  def self.dpi
+    @dpi || 72
+  end
+
+  # Used for svg
+  def self.dpi=(dpi)
+    @dpi = dpi.to_f
+  end
+
   # Given image as IO, StringIO, Tempfile or String finds its format and dimensions
   def initialize(data)
     ir = ImageReader.new(data)
@@ -79,6 +90,7 @@ class ImageSize
 
 private
 
+  SVG_R = /<svg\b([^>]*)>/
   def detect_format(ir)
     head = ir[0, 1024]
     case
@@ -93,6 +105,9 @@ private
     when head =~ /\/\* XPM \*\//            then :xpm
     when head[0, 4] == '8BPS'               then :psd
     when head =~ /^[FC]WS/                  then :swf
+    when head[SVG_R] ||
+      head =~ /<\?xml|<!--/ && ir[0, 4096][SVG_R]
+                                            then :svg
     when head[0, 2] =~ /\n[\000-\005]/      then :pcx
     end
   end
@@ -217,5 +232,28 @@ private
     values = rect_bits.unpack('@5' + "a#{value_bit_length}" * 4).map{ |bits| bits.to_i(2) }
     x_min, x_max, y_min, y_max = values
     [(x_max - x_min) / 20, (y_max - y_min) / 20]
+  end
+
+  DPI = 72
+  def size_of_svg(ir)
+    attributes = {}
+    ir.data[SVG_R, 1].scan(/(\S+)=(?:'([^']*)'|"([^"]*)"|([^'"\s]*))/) do |name, v0, v1, v2|
+      attributes[name] = v0 || v1 || v2
+    end
+    dpi = self.class.dpi
+    [attributes['width'], attributes['height']].map do |length|
+      if length
+        pixels = case length.downcase.strip[/(?:em|ex|px|in|cm|mm|pt|pc|%)\z/]
+        when 'em', 'ex', '%' then nil
+        when 'in' then length.to_f * dpi
+        when 'cm' then length.to_f * dpi / 2.54
+        when 'mm' then length.to_f * dpi / 25.4
+        when 'pt' then length.to_f * dpi / 72
+        when 'pc' then length.to_f * dpi / 6
+        else length.to_f
+        end
+        pixels.round if pixels
+      end
+    end
   end
 end
