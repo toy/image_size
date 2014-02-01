@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'image_size'
-  s.version     = '1.1.5'
+  s.version     = '1.2.0'
   s.summary     = %q{Measure image size using pure Ruby}
   s.description = %q{Measure following file dimensions: bmp, gif, jpeg, pbm, pcx, pgm, png, ppm, psd, swf, tiff, xbm, xpm}
   s.homepage    = "http://github.com/toy/#{s.name}"
