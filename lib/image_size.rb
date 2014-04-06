@@ -4,6 +4,8 @@ require 'stringio'
 require 'tempfile'
 
 class ImageSize
+  class FormatError < StandardError; end
+
   class Size < Array
     # join using 'x'
     def to_s
@@ -118,7 +120,7 @@ private
 
   def size_of_png(ir)
     unless ir[12, 4] == 'IHDR'
-      raise 'IHDR not in place for PNG'
+      raise FormatError, 'IHDR not in place for PNG'
     end
     ir[16, 8].unpack('NN')
   end
@@ -135,7 +137,7 @@ private
     loop do
       marker, code, length = ir[offset, 4].unpack('aan')
       offset += 4
-      raise 'JPEG marker not found' if marker != section_marker
+      raise FormatError, 'JPEG marker not found' if marker != section_marker
 
       if JpegCodeCheck.include?(code)
         return ir[offset + 1, 4].unpack('nn').reverse
@@ -179,7 +181,7 @@ private
     length = 1024
     until (data = ir[0, length]) =~ /"\s*(\d+)\s+(\d+)(\s+\d+\s+\d+){1,2}\s*"/m
       if data.length != length
-        raise 'XPM size not found'
+        raise FormatError, 'XPM size not found'
       end
       length += 1024
     end
@@ -203,7 +205,7 @@ private
     width = height = nil
     until width && height
       ifd = ir[offset, 12]
-      raise 'Reached end of directory entries in TIFF' if ifd.nil? || offset > num_dirent
+      raise FormatError, 'Reached end of directory entries in TIFF' if ifd.nil? || offset > num_dirent
       tag, type = ifd.unpack(endian2b * 2)
       offset += 12
 
