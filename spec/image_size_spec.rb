@@ -81,4 +81,15 @@ describe ImageSize do
       ImageSize.new(Object)
     }.should raise_error(ArgumentError)
   end
+
+  {
+    :png => "\211PNG\r\n\032\n",
+    :jpeg => "\377\330",
+  }.each do |type, data|
+    it "should raise FormatError if invalid #{type} given" do
+      lambda {
+        ImageSize.new(data)
+      }.should raise_error(ImageSize::FormatError)
+    end
+  end
 end
