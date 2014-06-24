@@ -135,9 +135,12 @@ private
     section_marker = "\xFF"
     offset = 2
     loop do
+      offset += 1 until [nil, section_marker].include? ir[offset, 1]
+      offset += 1 until section_marker != ir[offset + 1, 1]
+      raise FormatError, 'EOF in JPEG' if ir[offset, 1].nil?
+
       marker, code, length = ir[offset, 4].unpack('aan')
       offset += 4
-      raise FormatError, 'JPEG marker not found' if marker != section_marker
 
       if JpegCodeCheck.include?(code)
         return ir[offset + 1, 4].unpack('nn').reverse
