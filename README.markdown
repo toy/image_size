@@ -1,7 +1,7 @@
 # image_size
 
 measure image size using pure Ruby
-formats: `bmp`, `gif`, `jpeg`, `pbm`, `pcx`, `pgm`, `png`, `ppm`, `psd`, `swf`, `tiff`, `xbm`, `xpm`
+formats: `bmp`, `cur`, `gif`, `jpeg`, `ico`, `pbm`, `pcx`, `pgm`, `png`, `ppm`, `psd`, `swf`, `tiff`, `xbm`, `xpm`
 
 [![Build Status](https://travis-ci.org/toy/image_size.png?branch=master)](https://travis-ci.org/toy/image_size)
 
