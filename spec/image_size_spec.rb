@@ -28,25 +28,25 @@ describe ImageSize do
     it "should get format and dimensions for #{name} given IO" do
       File.open(path, 'rb') do |fh|
         is = ImageSize.new(fh)
-        [is.format, is.width, is.height].should == [format, width, height]
-        fh.should_not be_closed
+        expect([is.format, is.width, is.height]).to eq([format, width, height])
+        expect(fh).not_to be_closed
         fh.rewind
-        fh.read.should == file_data
+        expect(fh.read).to eq(file_data)
       end
     end
 
     it "should get format and dimensions for #{name} given StringIO" do
       io = StringIO.new(file_data)
       is = ImageSize.new(io)
-      [is.format, is.width, is.height].should == [format, width, height]
-      io.should_not be_closed
+      expect([is.format, is.width, is.height]).to eq([format, width, height])
+      expect(io).not_to be_closed
       io.rewind
-      io.read.should == file_data
+      expect(io.read).to eq(file_data)
     end
 
     it "should get format and dimensions for #{name} given file data" do
       is = ImageSize.new(file_data)
-      [is.format, is.width, is.height].should == [format, width, height]
+      expect([is.format, is.width, is.height]).to eq([format, width, height])
     end
 
     it "should get format and dimensions for #{name} given Tempfile" do
@@ -55,32 +55,32 @@ describe ImageSize do
         tf.write(file_data)
         tf.rewind
         is = ImageSize.new(tf)
-        [is.format, is.width, is.height].should == [format, width, height]
-        tf.should_not be_closed
+        expect([is.format, is.width, is.height]).to eq([format, width, height])
+        expect(tf).not_to be_closed
         tf.rewind
-        tf.read.should == file_data
+        expect(tf.read).to eq(file_data)
       end
     end
 
     it "should get format and dimensions for #{name} given IO when run twice" do
       File.open(path, 'rb') do |fh|
         is = ImageSize.new(fh)
-        [is.format, is.width, is.height].should == [format, width, height]
+        expect([is.format, is.width, is.height]).to eq([format, width, height])
         is = ImageSize.new(fh)
-        [is.format, is.width, is.height].should == [format, width, height]
+        expect([is.format, is.width, is.height]).to eq([format, width, height])
       end
     end
 
     it "should get format and dimensions for #{name} as path" do
       is = ImageSize.path(path)
-      [is.format, is.width, is.height].should == [format, width, height]
+      expect([is.format, is.width, is.height]).to eq([format, width, height])
     end
   end
 
   it "should raise ArgumentError if argument is not valid" do
-    lambda {
+    expect {
       ImageSize.new(Object)
-    }.should raise_error(ArgumentError)
+    }.to raise_error(ArgumentError)
   end
 
   {
@@ -88,9 +88,9 @@ describe ImageSize do
     :jpeg => "\377\330",
   }.each do |type, data|
     it "should raise FormatError if invalid #{type} given" do
-      lambda {
+      expect {
         ImageSize.new(data)
-      }.should raise_error(ImageSize::FormatError)
+      }.to raise_error(ImageSize::FormatError)
     end
   end
 end
