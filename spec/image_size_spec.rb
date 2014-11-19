@@ -20,6 +20,8 @@ describe ImageSize do
     ['test.xbm',  :xbm,  16,  32],
     ['test.xpm',  :xpm,  24,  32],
     ['test.svg',  :svg,  72, 100],
+    ['test.ico',  :ico, 256,  27],
+    ['test.cur',  :cur,  50, 256],
     ['image_size_spec.rb', nil, nil, nil],
   ].each do |name, format, width, height|
     path = File.join(File.dirname(__FILE__), name)

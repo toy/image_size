@@ -111,6 +111,8 @@ private
       head =~ /<\?xml|<!--/ && ir[0, 4096][SVG_R]
                                             then :svg
     when head[0, 2] =~ /\n[\000-\005]/      then :pcx
+    when head[0, 4] == "\000\000\001\000"   then :ico
+    when head[0, 4] == "\000\000\002\000"   then :cur
     end
   end
 
@@ -261,4 +263,9 @@ private
       end
     end
   end
+
+  def size_of_ico(ir)
+    ir[6, 2].unpack('CC').map{ |v| v.zero? ? 256 : v }
+  end
+  alias_method :size_of_cur, :size_of_ico
 end
