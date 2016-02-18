@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.description = %q{Measure following file dimensions: bmp, cur, gif, jpeg, ico, pbm, pcx, pgm, png, ppm, psd, swf, tiff, xbm, xpm}
   s.homepage    = "http://github.com/toy/#{s.name}"
   s.authors     = ['Keisuke Minami', 'Ivan Kuchin']
-  s.license     = 'MIT'
+  s.license     = 'Ruby'
 
   s.rubyforge_project = s.name
 
