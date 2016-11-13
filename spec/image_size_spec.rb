@@ -9,6 +9,7 @@ describe ImageSize do
     ['test.gif',  :gif, 668, 481],
     ['test.jpg', :jpeg, 320, 240],
     ['test2.jpg',:jpeg, 320, 240],
+    ['test.mng',  :mng, 612, 132],
     ['test.pbm',  :pbm,  85,  55],
     ['test.pcx',  :pcx,  70,  60],
     ['test.pgm',  :pgm,  90,  55],

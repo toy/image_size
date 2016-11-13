@@ -98,6 +98,7 @@ private
     case
     when head =~ /^GIF8[7,9]a/              then :gif
     when head[0, 8] == "\211PNG\r\n\032\n"  then :png
+    when head[0, 8] == "\212MNG\r\n\032\n"  then :mng
     when head[0, 2] == "\377\330"           then :jpeg
     when head[0, 2] == 'BM'                 then :bmp
     when head =~ /^P[1-7]/                  then :ppm
@@ -118,6 +119,13 @@ private
 
   def size_of_gif(ir)
     ir[6, 4].unpack('vv')
+  end
+
+  def size_of_mng(ir)
+    unless ir[12, 4] == 'MHDR'
+      raise FormatError, 'MHDR not in place for MNG'
+    end
+    ir[16, 8].unpack('NN')
   end
 
   def size_of_png(ir)
