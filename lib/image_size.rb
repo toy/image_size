@@ -97,7 +97,7 @@ private
     head = ir[0, 1024]
     case
     when head =~ /^GIF8[7,9]a/              then :gif
-    when head[0, 8] == "\211PNG\r\n\032\n"  then :png
+    when head[0, 8] == "\211PNG\r\n\032\n"  then detect_png_type(ir)
     when head[0, 8] == "\212MNG\r\n\032\n"  then :mng
     when head[0, 2] == "\377\330"           then :jpeg
     when head[0, 2] == 'BM'                 then :bmp
@@ -117,6 +117,19 @@ private
     end
   end
 
+  def detect_png_type(ir)
+    offset = 8
+    loop do
+      type = ir[offset + 4, 4]
+      break if ['IDAT', 'IEND', nil].include?(type)
+      return :apng if type == 'acTL'
+
+      length = ir[offset, 4].unpack('N')[0]
+      offset += 8 + length + 4
+    end
+    :png
+  end
+
   def size_of_gif(ir)
     ir[6, 4].unpack('vv')
   end
@@ -134,6 +147,7 @@ private
     end
     ir[16, 8].unpack('NN')
   end
+  alias_method :size_of_apng, :size_of_png
 
   JpegCodeCheck = [
     "\xc0", "\xc1", "\xc2", "\xc3",

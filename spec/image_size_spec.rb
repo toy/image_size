@@ -3,6 +3,7 @@ require 'image_size'
 
 describe ImageSize do
   [
+    ['test.apng',:apng, 192, 110],
     ['test2.bmp', :bmp,  42,  50],
     ['test3b.bmp',:bmp,  42,  50],
     ['test3t.bmp',:bmp,  42,  50],
