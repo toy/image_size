@@ -96,7 +96,7 @@ private
   def detect_format(ir)
     head = ir[0, 1024]
     case
-    when head =~ /^GIF8[7,9]a/              then :gif
+    when head =~ /^GIF8[79]a/               then :gif
     when head[0, 8] == "\211PNG\r\n\032\n"  then detect_png_type(ir)
     when head[0, 8] == "\212MNG\r\n\032\n"  then :mng
     when head[0, 2] == "\377\330"           then :jpeg
