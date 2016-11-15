@@ -2,34 +2,11 @@ require 'rspec'
 require 'image_size'
 
 describe ImageSize do
-  [
-    ['test.apng',:apng, 192, 110],
-    ['test2.bmp', :bmp,  42,  50],
-    ['test3b.bmp',:bmp,  42,  50],
-    ['test3t.bmp',:bmp,  42,  50],
-    ['test.gif',  :gif, 668, 481],
-    ['test.jpg', :jpeg, 320, 240],
-    ['test2.jpg',:jpeg, 320, 240],
-    ['test.mng',  :mng, 612, 132],
-    ['test.pbm',  :pbm,  85,  55],
-    ['test.pcx',  :pcx,  70,  60],
-    ['test.pgm',  :pgm,  90,  55],
-    ['test.png',  :png, 640, 532],
-    ['test.psd',  :psd,  16,  20],
-    ['test.swf',  :swf, 450, 200],
-    ['test.tif', :tiff,  48,  64],
-    ['test.xbm',  :xbm,  16,  32],
-    ['test.xpm',  :xpm,  24,  32],
-    ['test.svg',  :svg,  72, 100],
-    ['test.ico',  :ico, 256,  27],
-    ['test.cur',  :cur,  50, 256],
-    ['test.webp', :webp, 16, 32],
-    ['test2.webp', :webp, 16, 32],
-    ['test3.webp', :webp, 16, 32],
-    ['image_size_spec.rb', nil, nil, nil],
-  ].each do |name, format, width, height|
-    path = File.join(File.dirname(__FILE__), name)
-    file_data = File.open(path, 'rb', &:read)
+  (Dir['spec/images/*/*.*'] + [__FILE__]).each do |path|
+    name = File.basename(path)
+    match = /(\d+)x(\d+)\.([^.]+)$/.match(name)
+    width, height, format = match[1].to_i, match[2].to_i, match[3].to_sym if match
+    data = File.open(path, 'rb', &:read)
 
     it "should get format and dimensions for #{name} given IO" do
       File.open(path, 'rb') do |fh|
@@ -37,34 +14,34 @@ describe ImageSize do
         expect([is.format, is.width, is.height]).to eq([format, width, height])
         expect(fh).not_to be_closed
         fh.rewind
-        expect(fh.read).to eq(file_data)
+        expect(fh.read).to eq(data)
       end
     end
 
     it "should get format and dimensions for #{name} given StringIO" do
-      io = StringIO.new(file_data)
+      io = StringIO.new(data)
       is = ImageSize.new(io)
       expect([is.format, is.width, is.height]).to eq([format, width, height])
       expect(io).not_to be_closed
       io.rewind
-      expect(io.read).to eq(file_data)
+      expect(io.read).to eq(data)
     end
 
     it "should get format and dimensions for #{name} given file data" do
-      is = ImageSize.new(file_data)
+      is = ImageSize.new(data)
       expect([is.format, is.width, is.height]).to eq([format, width, height])
     end
 
     it "should get format and dimensions for #{name} given Tempfile" do
       Tempfile.open(name) do |tf|
         tf.binmode
-        tf.write(file_data)
+        tf.write(data)
         tf.rewind
         is = ImageSize.new(tf)
         expect([is.format, is.width, is.height]).to eq([format, width, height])
         expect(tf).not_to be_closed
         tf.rewind
-        expect(tf.read).to eq(file_data)
+        expect(tf.read).to eq(data)
       end
     end
 
