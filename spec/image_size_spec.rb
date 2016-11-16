@@ -8,7 +8,7 @@ describe ImageSize do
     width, height, format = match[1].to_i, match[2].to_i, match[3].to_sym if match
     data = File.open(path, 'rb', &:read)
 
-    it "should get format and dimensions for #{name} given IO" do
+    it "gets format and dimensions of #{name} given as IO" do
       File.open(path, 'rb') do |fh|
         is = ImageSize.new(fh)
         expect([is.format, is.width, is.height]).to eq([format, width, height])
@@ -18,7 +18,7 @@ describe ImageSize do
       end
     end
 
-    it "should get format and dimensions for #{name} given StringIO" do
+    it "gets format and dimensions of #{name} given as StringIO" do
       io = StringIO.new(data)
       is = ImageSize.new(io)
       expect([is.format, is.width, is.height]).to eq([format, width, height])
@@ -27,12 +27,12 @@ describe ImageSize do
       expect(io.read).to eq(data)
     end
 
-    it "should get format and dimensions for #{name} given file data" do
+    it "gets format and dimensions of #{name} given as data" do
       is = ImageSize.new(data)
       expect([is.format, is.width, is.height]).to eq([format, width, height])
     end
 
-    it "should get format and dimensions for #{name} given Tempfile" do
+    it "gets format and dimensions of #{name} given as Tempfile" do
       Tempfile.open(name) do |tf|
         tf.binmode
         tf.write(data)
@@ -45,7 +45,7 @@ describe ImageSize do
       end
     end
 
-    it "should get format and dimensions for #{name} given IO when run twice" do
+    it "gets format and dimensions of #{name} given as IO when run twice" do
       File.open(path, 'rb') do |fh|
         is = ImageSize.new(fh)
         expect([is.format, is.width, is.height]).to eq([format, width, height])
@@ -54,13 +54,13 @@ describe ImageSize do
       end
     end
 
-    it "should get format and dimensions for #{name} as path" do
+    it "gets format and dimensions of #{name} as path" do
       is = ImageSize.path(path)
       expect([is.format, is.width, is.height]).to eq([format, width, height])
     end
   end
 
-  it "should raise ArgumentError if argument is not valid" do
+  it "raises ArgumentError if argument is not valid" do
     expect {
       ImageSize.new(Object)
     }.to raise_error(ArgumentError)
@@ -70,7 +70,7 @@ describe ImageSize do
     :png => "\211PNG\r\n\032\n",
     :jpeg => "\377\330",
   }.each do |type, data|
-    it "should raise FormatError if invalid #{type} given" do
+    it "raises FormatError if invalid #{type} given" do
       expect {
         ImageSize.new(data)
       }.to raise_error(ImageSize::FormatError)
