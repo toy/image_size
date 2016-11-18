@@ -264,7 +264,6 @@ private
     [(x_max - x_min) / 20, (y_max - y_min) / 20]
   end
 
-  DPI = 72
   def size_of_svg(ir)
     attributes = {}
     ir.data[SVG_R, 1].scan(/(\S+)=(?:'([^']*)'|"([^"]*)"|([^'"\s]*))/) do |name, v0, v1, v2|
