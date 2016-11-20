@@ -1,9 +1,10 @@
+[![Gem Version](https://img.shields.io/gem/v/image_size.svg?style=flat)](https://rubygems.org/gems/image_size)
+[![Build Status](https://img.shields.io/travis/toy/image_size/master.svg?style=flat)](https://travis-ci.org/toy/image_size)
+
 # image_size
 
 measure image size using pure Ruby
 formats: `apng`, `bmp`, `cur`, `gif`, `jpeg`, `ico`, `mng`, `pbm`, `pcx`, `pgm`, `png`, `ppm`, `psd`, `swf`, `tiff`, `xbm`, `xpm`, `webp`
-
-[![Build Status](https://travis-ci.org/toy/image_size.png?branch=master)](https://travis-ci.org/toy/image_size)
 
 ## Download
 
