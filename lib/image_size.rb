@@ -85,9 +85,7 @@ class ImageSize
 
   # get image width and height as an array which to_s method returns "#{width}x#{height}"
   def size
-    if format
-      Size.new([width, height])
-    end
+    Size.new([width, height]) if format
   end
 
 private

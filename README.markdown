@@ -13,14 +13,24 @@ The latest version of image\_size can be found at http://github.com/toy/image_si
 
     gem install image_size
 
+## Usage
+
+    image_size = ImageSize.path('spec/images/jpeg/320x240.jpeg')
+    image_size.format       #=> :jpec
+    image_size.width        #=> 320
+    image_size.height       #=> 240
+    image_size.size         #=> [320, 240]
+
+`width` and `height` have aliases `w` and `h`.
+
 ## Examples
 
     require 'image_size'
 
-    p ImageSize.path('spec/test.jpg').size
+    ImageSize.path('spec/test.jpg')
 
     open('spec/test.jpg', 'rb') do |fh|
-      p ImageSize.new(fh).size
+      ImageSize.new(fh)
     end
 
 
@@ -28,12 +38,12 @@ The latest version of image\_size can be found at http://github.com/toy/image_si
     require 'open-uri'
 
     open('http://www.rubycgi.org/image/ruby_gtk_book_title.jpg', 'rb') do |fh|
-      p ImageSize.new(fh).size
+      ImageSize.new(fh)
     end
 
     open('http://www.rubycgi.org/image/ruby_gtk_book_title.jpg', 'rb') do |fh|
       data = fh.read
-      p ImageSize.new(data).size
+      ImageSize.new(data)
     end
 
 ## Licence
