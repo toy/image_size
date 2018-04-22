@@ -18,7 +18,7 @@ class ImageSize
     def initialize(data_or_io)
       @io = case data_or_io
       when IO, StringIO, Tempfile
-        data_or_io.dup.tap(&:rewind)
+        data_or_io
       when String
         StringIO.new(data_or_io)
       else
@@ -26,11 +26,6 @@ class ImageSize
       end
       @read = 0
       @data = ''
-    end
-
-    def close
-      @io.rewind
-      @io.close if IO === @io
     end
 
     CHUNK = 1024
@@ -69,7 +64,6 @@ class ImageSize
     if @format = detect_format(ir)
       @width, @height = send("size_of_#{@format}", ir)
     end
-    ir.close
   end
 
   # Image format

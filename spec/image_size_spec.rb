@@ -49,6 +49,7 @@ describe ImageSize do
       File.open(path, 'rb') do |fh|
         is = ImageSize.new(fh)
         expect([is.format, is.width, is.height]).to eq([format, width, height])
+        fh.rewind
         is = ImageSize.new(fh)
         expect([is.format, is.width, is.height]).to eq([format, width, height])
       end

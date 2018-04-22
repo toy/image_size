@@ -30,13 +30,24 @@ image_size.size         #=> [320, 240]
 
 ## Examples
 
+Note that starting with version `2.0.0` the `IO` given to `ImageSize` will not be rewound before or after use.
+So rewind if needed before passing to `ImageSize` and/or rewind after passing to `ImageSize` before reading data.
+
 ```ruby
 require 'image_size'
 
 ImageSize.path('spec/test.jpg')
 
-open('spec/test.jpg', 'rb') do |fh|
-  ImageSize.new(fh)
+File.open('spec/test.jpg', 'rb') do |fh|
+  image_size = ImageSize.new(fh)
+  fh.rewind
+  data = fh.read
+end
+
+File.open('spec/test.jpg', 'rb') do |fh|
+  data = fh.read
+  fh.rewind
+  image_size = ImageSize.new(fh)
 end
 ```
 
