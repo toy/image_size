@@ -45,7 +45,7 @@ class ImageSize
 
   # Given path to image finds its format, width and height
   def self.path(path)
-    open(path, 'rb'){ |f| new(f) }
+    File.open(path, 'rb'){ |f| new(f) }
   end
 
   # Used for svg
