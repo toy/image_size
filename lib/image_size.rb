@@ -67,7 +67,7 @@ class ImageSize
   def initialize(data)
     ir = ImageReader.new(data)
     if @format = detect_format(ir)
-      @width, @height = self.send("size_of_#{@format}", ir)
+      @width, @height = send("size_of_#{@format}", ir)
     end
     ir.close
   end
