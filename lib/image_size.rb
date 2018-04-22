@@ -1,5 +1,5 @@
-# -- coding: ASCII-8BIT --
-#
+# encoding: BINARY
+
 require 'stringio'
 require 'tempfile'
 
