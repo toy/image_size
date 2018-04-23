@@ -1,0 +1,55 @@
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  Exclude:
+    - '*.gemspec'
+
+Layout/AccessModifierIndentation:
+  EnforcedStyle: outdent
+
+Layout/CaseIndentation:
+  EnforcedStyle: end
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
+Layout/SpaceBeforeBlockBraces:
+  EnforcedStyle: no_space
+  EnforcedStyleForEmptyBraces: no_space
+
+Lint/PercentStringArray: # broken in rubocop 0.55.0
+  Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*.rb'
+
+Metrics/LineLength:
+  Max: 120
+
+Naming/UncommunicativeMethodParamName:
+  Enabled: false
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
+Style/EmptyCaseCondition:
+  Enabled: false
+
+Style/Encoding:
+  Enabled: false
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/ParallelAssignment:
+  Enabled: false
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma

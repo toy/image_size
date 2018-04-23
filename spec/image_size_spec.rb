@@ -61,10 +61,10 @@ describe ImageSize do
     end
   end
 
-  it "raises ArgumentError if argument is not valid" do
-    expect {
+  it 'raises ArgumentError if argument is not valid' do
+    expect do
       ImageSize.new(Object)
-    }.to raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   {
@@ -72,9 +72,9 @@ describe ImageSize do
     :jpeg => "\377\330",
   }.each do |type, data|
     it "raises FormatError if invalid #{type} given" do
-      expect {
+      expect do
         ImageSize.new(data)
-      }.to raise_error(ImageSize::FormatError)
+      end.to raise_error(ImageSize::FormatError)
     end
   end
 end

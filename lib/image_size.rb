@@ -3,9 +3,11 @@
 require 'stringio'
 require 'tempfile'
 
+# Determine image format and size
 class ImageSize
   class FormatError < StandardError; end
 
+  # Array joining with 'x'
   class Size < Array
     # join using 'x'
     def to_s
@@ -22,7 +24,7 @@ class ImageSize
       when String
         StringIO.new(data_or_io)
       else
-        raise ArgumentError.new("expected instance of IO, StringIO, Tempfile or String, got #{data_or_io.class}")
+        raise ArgumentError, "expected instance of IO, StringIO, Tempfile or String, got #{data_or_io.class}"
       end
       @read = 0
       @data = ''
@@ -32,12 +34,10 @@ class ImageSize
     def [](offset, length)
       while offset + length > @read
         @read += CHUNK
-        if data = @io.read(CHUNK)
-          if data.respond_to?(:encoding)
-            data.force_encoding(@data.encoding)
-          end
-          @data << data
-        end
+        data = @io.read(CHUNK)
+        next unless data
+        data.force_encoding(@data.encoding) if data.respond_to?(:encoding)
+        @data << data
       end
       @data[offset, length]
     end
@@ -61,9 +61,9 @@ class ImageSize
   # Given image as IO, StringIO, Tempfile or String finds its format and dimensions
   def initialize(data)
     ir = ImageReader.new(data)
-    if @format = detect_format(ir)
-      @width, @height = send("size_of_#{@format}", ir)
-    end
+    @format = detect_format(ir)
+    return unless @format
+    @width, @height = send("size_of_#{@format}", ir)
   end
 
   # Image format
@@ -71,11 +71,11 @@ class ImageSize
 
   # Image width
   attr_reader :width
-  alias :w :width
+  alias_method :w, :width
 
   # Image height
   attr_reader :height
-  alias :h :height
+  alias_method :h, :height
 
   # get image width and height as an array which to_s method returns "#{width}x#{height}"
   def size
@@ -97,7 +97,7 @@ private
     when head =~ /\#define\s+\S+\s+\d+/     then :xbm
     when head[0, 4] == "II*\000"            then :tiff
     when head[0, 4] == "MM\000*"            then :tiff
-    when head =~ /\/\* XPM \*\//            then :xpm
+    when head =~ %r{/\* XPM \*/}            then :xpm
     when head[0, 4] == '8BPS'               then :psd
     when head[0, 3] =~ /[FC]WS/             then :swf
     when head[SVG_R] ||
@@ -142,12 +142,12 @@ private
   end
   alias_method :size_of_apng, :size_of_png
 
-  JpegCodeCheck = [
-    "\xc0", "\xc1", "\xc2", "\xc3",
-    "\xc5", "\xc6", "\xc7",
-    "\xc9", "\xca", "\xcb",
-    "\xcd", "\xce", "\xcf",
-  ] # :nodoc:
+  JPEG_CODE_CHECK = %W[
+    \xC0 \xC1 \xC2 \xC3
+    \xC5 \xC6 \xC7
+    \xC9 \xCA \xCB
+    \xCD \xCE \xCF
+  ].freeze
   def size_of_jpeg(ir)
     section_marker = "\xFF"
     offset = 2
@@ -156,10 +156,10 @@ private
       offset += 1 until section_marker != ir[offset + 1, 1]
       raise FormatError, 'EOF in JPEG' if ir[offset, 1].nil?
 
-      marker, code, length = ir[offset, 4].unpack('aan')
+      _marker, code, length = ir[offset, 4].unpack('aan')
       offset += 4
 
-      if JpegCodeCheck.include?(code)
+      if JPEG_CODE_CHECK.include?(code)
         return ir[offset + 1, 4].unpack('nn').reverse
       end
       offset += length - 2
@@ -186,8 +186,8 @@ private
     header.gsub!(/^\#[^\n\r]*/m, '')
     header =~ /^(P[1-6])\s+?(\d+)\s+?(\d+)/m
     case $1
-      when 'P1', 'P4' then @format = :pbm
-      when 'P2', 'P5' then @format = :pgm
+    when 'P1', 'P4' then @format = :pbm
+    when 'P2', 'P5' then @format = :pgm
     end
     [$2.to_i, $3.to_i]
   end
@@ -213,7 +213,7 @@ private
   end
 
   def size_of_tiff(ir)
-    endian2b = (ir[0, 4] == "II*\000") ? 'v' : 'n'
+    endian2b = ir[0, 4] == "II*\000" ? 'v' : 'n'
     endian4b = endian2b.upcase
     packspec = [nil, 'C', nil, endian2b, endian4b, nil, 'c', nil, endian2b, endian4b]
 
@@ -229,14 +229,13 @@ private
       tag, type = ifd.unpack(endian2b * 2)
       offset += 12
 
-      unless packspec[type].nil?
-        value = ifd[8, 4].unpack(packspec[type])[0]
-        case tag
-        when 0x0100
-          width = value
-        when 0x0101
-          height = value
-        end
+      next if packspec[type].nil?
+      value = ifd[8, 4].unpack(packspec[type])[0]
+      case tag
+      when 0x0100
+        width = value
+      when 0x0101
+        height = value
       end
     end
     [width, height]
@@ -263,18 +262,17 @@ private
     end
     dpi = self.class.dpi
     [attributes['width'], attributes['height']].map do |length|
-      if length
-        pixels = case length.downcase.strip[/(?:em|ex|px|in|cm|mm|pt|pc|%)\z/]
-        when 'em', 'ex', '%' then nil
-        when 'in' then length.to_f * dpi
-        when 'cm' then length.to_f * dpi / 2.54
-        when 'mm' then length.to_f * dpi / 25.4
-        when 'pt' then length.to_f * dpi / 72
-        when 'pc' then length.to_f * dpi / 6
-        else length.to_f
-        end
-        pixels.round if pixels
+      next unless length
+      pixels = case length.downcase.strip[/(?:em|ex|px|in|cm|mm|pt|pc|%)\z/]
+      when 'em', 'ex', '%' then nil
+      when 'in' then length.to_f * dpi
+      when 'cm' then length.to_f * dpi / 2.54
+      when 'mm' then length.to_f * dpi / 25.4
+      when 'pt' then length.to_f * dpi / 72
+      when 'pc' then length.to_f * dpi / 6
+      else length.to_f
       end
+      pixels.round if pixels
     end
   end
 
