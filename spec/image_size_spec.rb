@@ -4,61 +4,79 @@ require 'tempfile'
 
 describe ImageSize do
   (Dir['spec/images/*/*.*'] + [__FILE__]).each do |path|
-    name = File.basename(path)
-    match = /(\d+)x(\d+)\.([^.]+)$/.match(name)
-    width, height, format = match[1].to_i, match[2].to_i, match[3].to_sym if match
-    data = File.open(path, 'rb', &:read)
-
-    it "gets format and dimensions of #{name} given as IO" do
-      File.open(path, 'rb') do |fh|
-        is = ImageSize.new(fh)
-        expect([is.format, is.width, is.height]).to eq([format, width, height])
-        expect(fh).not_to be_closed
-        fh.rewind
-        expect(fh.read).to eq(data)
+    describe "for #{path}" do
+      let(:name){ File.basename(path) }
+      let(:attributes) do
+        match = /(\d+)x(\d+)\.([^.]+)$/.match(name)
+        width, height, format = match[1].to_i, match[2].to_i, match[3].to_sym if match
+        size = format && [width, height]
+        {
+          :format => format,
+          :width => width,
+          :height => height,
+          :w => width,
+          :h => height,
+          :size => size,
+        }
       end
-    end
+      let(:file_data){ File.open(path, 'rb', &:read) }
 
-    it "gets format and dimensions of #{name} given as StringIO" do
-      io = StringIO.new(data)
-      is = ImageSize.new(io)
-      expect([is.format, is.width, is.height]).to eq([format, width, height])
-      expect(io).not_to be_closed
-      io.rewind
-      expect(io.read).to eq(data)
-    end
-
-    it "gets format and dimensions of #{name} given as data" do
-      is = ImageSize.new(data)
-      expect([is.format, is.width, is.height]).to eq([format, width, height])
-    end
-
-    it "gets format and dimensions of #{name} given as Tempfile" do
-      Tempfile.open(name) do |tf|
-        tf.binmode
-        tf.write(data)
-        tf.rewind
-        is = ImageSize.new(tf)
-        expect([is.format, is.width, is.height]).to eq([format, width, height])
-        expect(tf).not_to be_closed
-        tf.rewind
-        expect(tf.read).to eq(data)
+      context 'given as data' do
+        it 'gets format and dimensions' do
+          data = file_data.dup
+          image_size = ImageSize.new(data)
+          expect(image_size).to have_attributes(attributes)
+          expect(data).to eq(file_data)
+        end
       end
-    end
 
-    it "gets format and dimensions of #{name} given as IO when run twice" do
-      File.open(path, 'rb') do |fh|
-        is = ImageSize.new(fh)
-        expect([is.format, is.width, is.height]).to eq([format, width, height])
-        fh.rewind
-        is = ImageSize.new(fh)
-        expect([is.format, is.width, is.height]).to eq([format, width, height])
+      context 'given as IO' do
+        it 'gets format and dimensions' do
+          File.open(path, 'rb') do |io|
+            image_size = ImageSize.new(io)
+            expect(image_size).to have_attributes(attributes)
+            expect(io).not_to be_closed
+            expect(io.pos).to_not be_zero
+            io.rewind
+            expect(io.read).to eq(file_data)
+          end
+        end
       end
-    end
 
-    it "gets format and dimensions of #{name} as path" do
-      is = ImageSize.path(path)
-      expect([is.format, is.width, is.height]).to eq([format, width, height])
+      context 'given as StringIO' do
+        it 'gets format and dimensions' do
+          io = StringIO.new(file_data)
+          image_size = ImageSize.new(io)
+          expect(image_size).to have_attributes(attributes)
+          expect(io).not_to be_closed
+          expect(io.pos).to_not be_zero
+          io.rewind
+          expect(io.read).to eq(file_data)
+        end
+      end
+
+      context 'given as Tempfile' do
+        it 'gets format and dimensions' do
+          Tempfile.open(name) do |io|
+            io.binmode
+            io.write(file_data)
+            io.rewind
+            image_size = ImageSize.new(io)
+            expect(image_size).to have_attributes(attributes)
+            expect(io).not_to be_closed
+            expect(io.pos).to_not be_zero
+            io.rewind
+            expect(io.read).to eq(file_data)
+          end
+        end
+      end
+
+      context 'using path method' do
+        it 'gets format and dimensions' do
+          image_size = ImageSize.path(path)
+          expect(image_size).to have_attributes(attributes)
+        end
+      end
     end
   end
 
