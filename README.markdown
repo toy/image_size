@@ -8,7 +8,7 @@ formats: `apng`, `bmp`, `cur`, `gif`, `jpeg`, `ico`, `mng`, `pbm`, `pcx`, `pgm`,
 
 ## Download
 
-The latest version of image\_size can be found at http://github.com/toy/image_size
+The latest version of image\_size can be found at https://github.com/toy/image_size
 
 ## Installation
 
@@ -23,6 +23,8 @@ image_size = ImageSize.path('spec/images/jpeg/320x240.jpeg')
 image_size.format       #=> :jpec
 image_size.width        #=> 320
 image_size.height       #=> 240
+image_size.w            #=> 320
+image_size.h            #=> 240
 image_size.size         #=> [320, 240]
 ```
 
@@ -51,6 +53,16 @@ File.open('spec/test.jpg', 'rb') do |fh|
 end
 ```
 
+Any object responding to read and eof? will do:
+
+```ruby
+require 'image_size'
+
+ImageSize.new(ARGF)
+```
+
+Works with open-uri if needed:
+
 ```ruby
 require 'image_size'
 require 'open-uri'
@@ -72,3 +84,4 @@ This code is free to use under the terms of the Ruby's licence.
 ## Contact
 
 Original author: "Keisuke Minami": mailto:keisuke@rccn.com
+Further development by Ivan Kuchin https://github.com/toy/image_size
