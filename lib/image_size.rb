@@ -1,7 +1,6 @@
 # encoding: BINARY
 
 require 'stringio'
-require 'tempfile'
 
 # Determine image format and size
 class ImageSize
@@ -18,24 +17,21 @@ class ImageSize
   class ImageReader # :nodoc:
     attr_reader :data
     def initialize(data_or_io)
-      @io = case data_or_io
-      when IO, StringIO, Tempfile
-        data_or_io
-      when String
+      @io = if data_or_io.is_a?(String)
         StringIO.new(data_or_io)
+      elsif data_or_io.respond_to?(:read) && data_or_io.respond_to?(:eof?)
+        data_or_io
       else
-        raise ArgumentError, "expected instance of IO, StringIO, Tempfile or String, got #{data_or_io.class}"
+        raise ArgumentError, "expected data as String or an object responding to read and eof?, got #{data_or_io.class}"
       end
-      @read = 0
       @data = ''
     end
 
     CHUNK = 1024
     def [](offset, length)
-      while offset + length > @read
-        @read += CHUNK
+      while !@io.eof? && @data.length < offset + length
         data = @io.read(CHUNK)
-        next unless data
+        break unless data
         data.force_encoding(@data.encoding) if data.respond_to?(:encoding)
         @data << data
       end
@@ -58,7 +54,7 @@ class ImageSize
     @dpi = dpi.to_f
   end
 
-  # Given image as IO, StringIO, Tempfile or String finds its format and dimensions
+  # Given image as any class responding to read and eof? or data as String, finds its format and dimensions
   def initialize(data)
     ir = ImageReader.new(data)
     @format = detect_format(ir)

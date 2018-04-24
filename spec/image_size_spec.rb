@@ -1,5 +1,6 @@
 require 'rspec'
 require 'image_size'
+require 'tempfile'
 
 describe ImageSize do
   (Dir['spec/images/*/*.*'] + [__FILE__]).each do |path|
