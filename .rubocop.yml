@@ -24,8 +24,14 @@ Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
 
+Metrics/ClassLength:
+  Enabled: false
+
 Metrics/LineLength:
   Max: 120
+
+Metrics/MethodLength:
+  Enabled: false
 
 Naming/UncommunicativeMethodParamName:
   Enabled: false
