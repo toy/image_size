@@ -53,7 +53,7 @@ File.open('spec/test.jpg', 'rb') do |fh|
 end
 ```
 
-Any object responding to read and eof? will do:
+Any object responding to `read` and `eof?` will do:
 
 ```ruby
 require 'image_size'
@@ -61,19 +61,18 @@ require 'image_size'
 ImageSize.new(ARGF)
 ```
 
-Works with open-uri if needed:
+Works with `open-uri` if needed:
 
 ```ruby
 require 'image_size'
 require 'open-uri'
 
-open('http://www.rubycgi.org/image/ruby_gtk_book_title.jpg', 'rb') do |fh|
+URI.parse('http://www.rubycgi.org/image/ruby_gtk_book_title.jpg').open('rb') do |fh|
   ImageSize.new(fh)
 end
 
 open('http://www.rubycgi.org/image/ruby_gtk_book_title.jpg', 'rb') do |fh|
-  data = fh.read
-  ImageSize.new(data)
+  ImageSize.new(fh)
 end
 ```
 
