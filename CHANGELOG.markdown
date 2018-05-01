@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## v2.0.0 (2018-05-01)
+
 * Allow any class responding to `read` and `eof?` to be passed to `ImageSize` [@toy](https://github.com/toy)
 * Introduce `rubocop` [@toy](https://github.com/toy)
 * Use `File.open` instead of `Kernel#open` [@toy](https://github.com/toy)
