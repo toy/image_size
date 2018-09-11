@@ -32,6 +32,7 @@ class ImageSize
       while !@io.eof? && @data.length < offset + length
         data = @io.read(CHUNK)
         break unless data
+
         data.force_encoding(@data.encoding) if data.respond_to?(:encoding)
         @data << data
       end
@@ -59,6 +60,7 @@ class ImageSize
     ir = ImageReader.new(data)
     @format = detect_format(ir)
     return unless @format
+
     @width, @height = send("size_of_#{@format}", ir)
   end
 
@@ -127,6 +129,7 @@ private
     unless ir[12, 4] == 'MHDR'
       raise FormatError, 'MHDR not in place for MNG'
     end
+
     ir[16, 8].unpack('NN')
   end
 
@@ -134,6 +137,7 @@ private
     unless ir[12, 4] == 'IHDR'
       raise FormatError, 'IHDR not in place for PNG'
     end
+
     ir[16, 8].unpack('NN')
   end
   alias_method :size_of_apng, :size_of_png
@@ -158,6 +162,7 @@ private
       if JPEG_CODE_CHECK.include?(code)
         return ir[offset + 1, 4].unpack('nn').reverse
       end
+
       offset += length - 2
     end
   end
@@ -199,6 +204,7 @@ private
       if data.length != length
         raise FormatError, 'XPM size not found'
       end
+
       length += 1024
     end
     [$1.to_i, $2.to_i]
@@ -222,10 +228,12 @@ private
     until width && height
       ifd = ir[offset, 12]
       raise FormatError, 'Reached end of directory entries in TIFF' if ifd.nil? || offset > num_dirent
+
       tag, type = ifd.unpack(endian2b * 2)
       offset += 12
 
       next if packspec[type].nil?
+
       value = ifd[8, 4].unpack(packspec[type])[0]
       case tag
       when 0x0100
@@ -259,6 +267,7 @@ private
     dpi = self.class.dpi
     [attributes['width'], attributes['height']].map do |length|
       next unless length
+
       pixels = case length.downcase.strip[/(?:em|ex|px|in|cm|mm|pt|pc|%)\z/]
       when 'em', 'ex', '%' then nil
       when 'in' then length.to_f * dpi
