@@ -82,7 +82,7 @@ class ImageSize
 
 private
 
-  SVG_R = /<svg\b([^>]*)>/
+  SVG_R = /<svg\b([^>]*)>/.freeze
   def detect_format(ir)
     head = ir[0, 1024]
     case
