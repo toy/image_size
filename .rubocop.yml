@@ -54,6 +54,9 @@ Style/IfUnlessModifier:
 Style/ParallelAssignment:
   Enabled: false
 
+Style/SafeNavigation:
+  Enabled: false
+
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: comma
 

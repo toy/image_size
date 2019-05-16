@@ -1,4 +1,5 @@
 # encoding: BINARY
+# frozen_string_literal: true
 
 require 'stringio'
 
