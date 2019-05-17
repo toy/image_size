@@ -2,6 +2,8 @@
 
 ## unreleased
 
+* Adapt to frozen string literals [@toy](https://github.com/toy)
+
 ## v2.0.0 (2018-05-01)
 
 * Allow any class responding to `read` and `eof?` to be passed to `ImageSize` [@toy](https://github.com/toy)

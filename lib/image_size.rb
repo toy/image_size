@@ -25,7 +25,7 @@ class ImageSize
       else
         raise ArgumentError, "expected data as String or an object responding to read and eof?, got #{data_or_io.class}"
       end
-      @data = ''
+      @data = String.new # not frozen
     end
 
     CHUNK = 1024
