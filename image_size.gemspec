@@ -9,8 +9,6 @@ Gem::Specification.new do |s|
   s.authors     = ['Keisuke Minami', 'Ivan Kuchin']
   s.license     = 'Ruby'
 
-  s.rubyforge_project = s.name
-
   s.metadata = {
     'bug_tracker_uri'   => "https://github.com/toy/#{s.name}/issues",
     'changelog_uri'     => "https://github.com/toy/#{s.name}/blob/master/CHANGELOG.markdown",
