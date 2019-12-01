@@ -33,7 +33,7 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Enabled: false
 
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Enabled: false
 
 Style/Alias:
