@@ -13,6 +13,9 @@ Layout/CaseIndentation:
 Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
 
+Layout/LineLength:
+  Max: 120
+
 Layout/SpaceBeforeBlockBraces:
   EnforcedStyle: no_space
   EnforcedStyleForEmptyBraces: no_space
@@ -26,9 +29,6 @@ Metrics/BlockLength:
 
 Metrics/ClassLength:
   Enabled: false
-
-Metrics/LineLength:
-  Max: 120
 
 Metrics/MethodLength:
   Enabled: false
@@ -45,8 +45,17 @@ Style/EmptyCaseCondition:
 Style/Encoding:
   Enabled: false
 
+Style/HashEachMethods:
+  Enabled: true
+
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
+
+Style/HashTransformKeys:
+  Enabled: false
+
+Style/HashTransformValues:
+  Enabled: false
 
 Style/IfUnlessModifier:
   Enabled: false
