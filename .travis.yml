@@ -19,9 +19,9 @@ rvm:
 script: bundle exec rspec
 matrix:
   include:
-    - env: RUBOCOP=✓
+    - env: RUBOCOP=1
       rvm: '2.6.5'
       script: bundle exec rubocop
-    - env: CHECK_RUBIES=✓
+    - env: CHECK_RUBIES=1
       rvm: '2.6.5'
       script: bundle exec travis_check_rubies
