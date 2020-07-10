@@ -17,6 +17,7 @@ class ImageSize
 
   class ImageReader # :nodoc:
     attr_reader :data
+
     def initialize(data_or_io)
       @io = if data_or_io.is_a?(String)
         StringIO.new(data_or_io)

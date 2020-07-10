@@ -3,6 +3,7 @@ inherit_from: .rubocop_todo.yml
 AllCops:
   Exclude:
     - '*.gemspec'
+  NewCops: enable
 
 Layout/AccessModifierIndentation:
   EnforcedStyle: outdent
@@ -34,6 +35,9 @@ Metrics/MethodLength:
   Enabled: false
 
 Naming/MethodParameterName:
+  Enabled: false
+
+Style/AccessorGrouping:
   Enabled: false
 
 Style/Alias:
