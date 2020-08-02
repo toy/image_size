@@ -96,16 +96,16 @@ private
     when head[0, 2] == 'BM'                                       then :bmp
     when head[0, 2] =~ /P[1-7]/                                   then :ppm
     when head =~ /\#define\s+\S+\s+\d+/                           then :xbm
-    when head[0, 4] == "II*\000"                                  then :tiff
-    when head[0, 4] == "MM\000*"                                  then :tiff
+    when head[0, 4] == "II*\0"                                    then :tiff
+    when head[0, 4] == "MM\0*"                                    then :tiff
     when head =~ %r{/\* XPM \*/}                                  then :xpm
     when head[0, 4] == '8BPS'                                     then :psd
     when head[0, 3] =~ /[FC]WS/                                   then :swf
     when head =~ SVG_R || (head =~ XML_R && ir[0, 4096][SVG_R])   then :svg
-    when head[0, 2] =~ /\n[\000-\005]/                            then :pcx
+    when head[0, 2] =~ /\n[\0-\5]/                                then :pcx
     when head[0, 12] =~ /RIFF(?m:....)WEBP/                       then :webp
-    when head[0, 4] == "\000\000\001\000"                         then :ico
-    when head[0, 4] == "\000\000\002\000"                         then :cur
+    when head[0, 4] == "\0\0\1\0"                                 then :ico
+    when head[0, 4] == "\0\0\2\0"                                 then :cur
     end
   end
 
