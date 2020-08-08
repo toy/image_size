@@ -96,8 +96,7 @@ private
     when head[0, 2] == 'BM'                                       then :bmp
     when head[0, 2] =~ /P[1-7]/                                   then :ppm
     when head =~ /\#define\s+\S+\s+\d+/                           then :xbm
-    when head[0, 4] == "II*\0"                                    then :tiff
-    when head[0, 4] == "MM\0*"                                    then :tiff
+    when %W[II*\0 MM\0*].include?(head[0, 4])                     then :tiff
     when head =~ %r{/\* XPM \*/}                                  then :xpm
     when head[0, 4] == '8BPS'                                     then :psd
     when head[0, 3] =~ /[FC]WS/                                   then :swf
