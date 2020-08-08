@@ -94,7 +94,7 @@ private
     when head[0, 8] == "\212MNG\r\n\032\n"                        then :mng
     when head[0, 2] == "\377\330"                                 then :jpeg
     when head[0, 2] == 'BM'                                       then :bmp
-    when head[0, 2] =~ /P[1-7]/                                   then :ppm
+    when head[0, 3] =~ /P[1-6]\s|P7\n/                            then detect_pnm_type(ir)
     when head =~ /\#define\s+\S+\s+\d+/                           then :xbm
     when %W[II*\0 MM\0*].include?(head[0, 4])                     then :tiff
     when head =~ %r{/\* XPM \*/}                                  then :xpm
@@ -119,6 +119,15 @@ private
       offset += 8 + length + 4
     end
     :png
+  end
+
+  def detect_pnm_type(ir)
+    case ir[0, 2]
+    when 'P1', 'P4' then :pbm
+    when 'P2', 'P5' then :pgm
+    when 'P3', 'P6' then :ppm
+    when 'P7'       then :pam
+    end
   end
 
   def size_of_gif(ir)
@@ -186,11 +195,37 @@ private
     header = ir[0, 1024]
     header.gsub!(/^\#[^\n\r]*/m, '')
     header =~ /^(P[1-6])\s+?(\d+)\s+?(\d+)/m
-    case $1
-    when 'P1', 'P4' then @format = :pbm
-    when 'P2', 'P5' then @format = :pgm
-    end
     [$2.to_i, $3.to_i]
+  end
+  alias_method :size_of_pbm, :size_of_ppm
+  alias_method :size_of_pgm, :size_of_ppm
+
+  def size_of_pam(ir)
+    width = height = nil
+    offset = 3
+    loop do
+      if ir[offset, 1] == '#'
+        offset += 1 until ["\n", '', nil].include?(ir[offset, 1])
+        offset += 1
+      else
+        chunk = ir[offset, 32]
+        case chunk
+        when /\AWIDTH (\d+)\n/
+          width = $1.to_i
+        when /\AHEIGHT (\d+)\n/
+          height = $1.to_i
+        when /\AENDHDR\n/
+          break
+        when /\A(?:DEPTH|MAXVAL) \d+\n/, /\ATUPLTYPE \S+\n/
+          # ignore
+        else
+          raise FormatError, "Unexpected data in PAM header: #{chunk.inspect}"
+        end
+        offset += $&.length
+        break if width && height
+      end
+    end
+    [width, height]
   end
 
   def size_of_xbm(ir)
@@ -254,7 +289,7 @@ private
     value_bit_length = ir[8, 1].unpack('B5').first.to_i(2)
     bit_length = 5 + value_bit_length * 4
     rect_bits = ir[8, bit_length / 8 + 1].unpack("B#{bit_length}").first
-    values = rect_bits.unpack('@5' + "a#{value_bit_length}" * 4).map{ |bits| bits.to_i(2) }
+    values = rect_bits[5..-1].unpack("a#{value_bit_length}" * 4).map{ |bits| bits.to_i(2) }
     x_min, x_max, y_min, y_max = values
     [(x_max - x_min) / 20, (y_max - y_min) / 20]
   end
