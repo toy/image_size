@@ -2,6 +2,7 @@
 
 ## unreleased
 
+* Add handling of JPEG 2000: part 1 (jp2), part 2 (jpx) and codestream (j2c) [#13](https://github.com/toy/image_size/issues/13) [@toy](https://github.com/toy)
 * Correct handling of pam images and cleanup handling of Netpbm images (pbm, pgm, pnm) [@toy](https://github.com/toy)
 
 ## v2.0.2 (2019-07-14)

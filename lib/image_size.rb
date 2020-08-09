@@ -105,6 +105,8 @@ private
     when head[0, 12] =~ /RIFF(?m:....)WEBP/                       then :webp
     when head[0, 4] == "\0\0\1\0"                                 then :ico
     when head[0, 4] == "\0\0\2\0"                                 then :cur
+    when head[0, 12] == "\0\0\0\fjP  \r\n\207\n"                  then detect_jpeg2000_type(ir)
+    when head[0, 4] == "\377O\377Q"                               then :j2c
     end
   end
 
@@ -127,6 +129,17 @@ private
     when 'P2', 'P5' then :pgm
     when 'P3', 'P6' then :ppm
     when 'P7'       then :pam
+    end
+  end
+
+  def detect_jpeg2000_type(ir)
+    return unless ir[16, 4] == 'ftyp'
+
+    # using xl-box would be weird, but doesn't seem to contradict specification
+    skip = ir[12, 4] == "\0\0\0\1" ? 16 : 8
+    case ir[12 + skip, 4]
+    when 'jp2 ' then :jp2
+    when 'jpx ' then :jpx
     end
   end
 
@@ -332,5 +345,45 @@ private
       w16, w8, h16, h8 = ir[24, 6].unpack('vCvC')
       [(w16 | w8 << 16) + 1, (h16 | h8 << 16) + 1]
     end
+  end
+
+  def size_of_jp2(ir)
+    offset = 12
+    stop = nil
+    in_header = false
+    loop do
+      break if stop && offset >= stop
+      break if ir[offset, 4] == '' || ir[offset, 4].nil?
+
+      size = ir[offset, 4].unpack('N')[0]
+      type = ir[offset + 4, 4]
+
+      data_offset = 8
+      case size
+      when 1
+        size = ir[offset, 8].unpack('Q>')[0]
+        data_offset = 16
+        raise FormatError, "Unexpected xl-box size #{size}" if (1..15).include?(size)
+      when 2..7
+        raise FormatError, "Reserved box size #{size}"
+      end
+
+      if type == 'jp2h'
+        stop = offset + size unless size.zero?
+        offset += data_offset
+        in_header = true
+      elsif in_header && type == 'ihdr'
+        return ir[offset + data_offset, 8].unpack('NN').reverse
+      else
+        break if size.zero? # box to the end of file
+
+        offset += size
+      end
+    end
+  end
+  alias_method :size_of_jpx, :size_of_jp2
+
+  def size_of_j2c(ir)
+    ir[8, 8].unpack('NN')
   end
 end
