@@ -5,11 +5,11 @@ require 'image_size'
 require 'tempfile'
 
 describe ImageSize do
-  MAX_FILESIZE = 16_384
+  max_filesize = 16_384
 
   (Dir['spec/images/*/*.*'] + [__FILE__]).each do |path|
     filesize = File.size(path)
-    warn "#{path} is too big #{filesize} (max #{MAX_FILESIZE})" if filesize > MAX_FILESIZE
+    warn "#{path} is too big #{filesize} (max #{max_filesize})" if filesize > max_filesize
 
     describe "for #{path}" do
       let(:name){ File.basename(path) }
