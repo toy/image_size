@@ -1,5 +1,4 @@
-sudo: false
-dist: trusty
+dist: xenial
 language: ruby
 before_install:
   - gem install bundler || gem install bundler --version '< 2'
