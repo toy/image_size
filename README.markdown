@@ -85,9 +85,7 @@ end
 
 ## Licence
 
-This code is free to use under the terms of the Ruby's licence.
+This code is free to use under the terms of the [Ruby's licence](LICENSE.txt).
 
-## Contact
-
-Original author: "Keisuke Minami": mailto:keisuke@rccn.com
-Further development by Ivan Kuchin https://github.com/toy/image_size
+Original author: Keisuke Minami <keisuke@rccn.com>.\
+Further development 2010-2020 Ivan Kuchin https://github.com/toy/image_size

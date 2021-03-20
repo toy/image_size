@@ -2,6 +2,8 @@
 
 ## unreleased
 
+* Add actual license texts, assuming old dual Ruby/GPLv2 license [#14](https://github.com/toy/image_size/issues/14) [@toy](https://github.com/toy)
+
 ## v2.1.0 (2020-08-09)
 
 * Add handling of JPEG 2000: part 1 (jp2), part 2 (jpx) and codestream (j2c) [#13](https://github.com/toy/image_size/issues/13) [@toy](https://github.com/toy)
