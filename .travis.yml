@@ -9,18 +9,18 @@ rvm:
   - '2.2.10'
   - '2.3.8'
   - '2.4.10'
-  - '2.5.8'
-  - '2.6.6'
-  - '2.7.2'
-  - '3.0.0'
+  - '2.5.9'
+  - '2.6.7'
+  - '2.7.3'
+  - '3.0.1'
   - 'jruby-9.1.17.0'
   - 'jruby-9.2.14.0'
 script: bundle exec rspec
 matrix:
   include:
     - env: RUBOCOP=1
-      rvm: '2.6.6'
+      rvm: '2.6.7'
       script: bundle exec rubocop
     - env: CHECK_RUBIES=1
-      rvm: '2.6.6'
+      rvm: '2.6.7'
       script: bundle exec travis_check_rubies
