@@ -1,5 +1,5 @@
 [![Gem Version](https://img.shields.io/gem/v/image_size.svg?style=flat)](https://rubygems.org/gems/image_size)
-[![Build Status](https://img.shields.io/travis/toy/image_size/master.svg?style=flat)](https://travis-ci.org/toy/image_size)
+[![Build Status](https://github.com/toy/image_size/actions/workflows/check.yml/badge.svg)](https://github.com/toy/image_size/actions/workflows/check.yml)
 
 # image_size
 
