@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## v2.1.1 (2021-07-04)
+
 * Add actual license texts, assuming old dual Ruby/GPLv2 license [#14](https://github.com/toy/image_size/issues/14) [@toy](https://github.com/toy)
 
 ## v2.1.0 (2020-08-09)
