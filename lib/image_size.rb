@@ -164,11 +164,11 @@ private
   end
   alias_method :size_of_apng, :size_of_png
 
-  JPEG_CODE_CHECK = %W[
-    \xC0 \xC1 \xC2 \xC3
-    \xC5 \xC6 \xC7
-    \xC9 \xCA \xCB
-    \xCD \xCE \xCF
+  JPEG_CODE_CHECK = [
+    0xC0, 0xC1, 0xC2, 0xC3,
+    0xC5, 0xC6, 0xC7,
+    0xC9, 0xCA, 0xCB,
+    0xCD, 0xCE, 0xCF
   ].freeze
   def size_of_jpeg(ir)
     section_marker = "\xFF"
@@ -178,7 +178,7 @@ private
       offset += 1 until section_marker != ir[offset + 1, 1]
       raise FormatError, 'EOF in JPEG' if ir[offset, 1].nil?
 
-      _marker, code, length = ir[offset, 4].unpack('aan')
+      _marker, code, length = ir[offset, 4].unpack('aCn')
       offset += 4
 
       if JPEG_CODE_CHECK.include?(code)
