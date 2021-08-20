@@ -2,6 +2,8 @@
 
 ## unreleased
 
+* Fix for pcx on big endian systems by forcing reading dimensions in little endian byte order [#15](https://github.com/toy/image_size/issues/15) [#16](https://github.com/toy/image_size/pull/16) [@mtasaka](https://github.com/mtasaka)
+
 ## v2.1.1 (2021-07-04)
 
 * Add actual license texts, assuming old dual Ruby/GPLv2 license [#14](https://github.com/toy/image_size/issues/14) [@toy](https://github.com/toy)
