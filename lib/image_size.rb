@@ -294,7 +294,7 @@ private
   end
 
   def size_of_pcx(ir)
-    parts = ir[4, 8].unpack('S4')
+    parts = ir[4, 8].unpack('v4')
     [parts[2] - parts[0] + 1, parts[3] - parts[1] + 1]
   end
 
