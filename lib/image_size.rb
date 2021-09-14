@@ -300,8 +300,8 @@ private
 
   def size_of_swf(ir)
     value_bit_length = ir[8, 1].unpack('B5').first.to_i(2)
-    bit_length = 5 + value_bit_length * 4
-    rect_bits = ir[8, bit_length / 8 + 1].unpack("B#{bit_length}").first
+    bit_length = 5 + (value_bit_length * 4)
+    rect_bits = ir[8, (bit_length / 8) + 1].unpack("B#{bit_length}").first
     values = rect_bits[5..-1].unpack("a#{value_bit_length}" * 4).map{ |bits| bits.to_i(2) }
     x_min, x_max, y_min, y_max = values
     [(x_max - x_min) / 20, (y_max - y_min) / 20]
@@ -340,10 +340,10 @@ private
       ir[26, 4].unpack('vv').map{ |v| v & 0x3fff }
     when 'VP8L'
       n = ir[21, 4].unpack('V')[0]
-      [(n & 0x3fff) + 1, (n >> 14 & 0x3fff) + 1]
+      [(n & 0x3fff) + 1, ((n >> 14) & 0x3fff) + 1]
     when 'VP8X'
       w16, w8, h16, h8 = ir[24, 6].unpack('vCvC')
-      [(w16 | w8 << 16) + 1, (h16 | h8 << 16) + 1]
+      [(w16 | (w8 << 16)) + 1, (h16 | (h8 << 16)) + 1]
     end
   end
 
