@@ -73,9 +73,7 @@ class ImageSize
   def initialize(data)
     ir = ImageReader.new(data)
     @format = detect_format(ir)
-    return unless @format
-
-    @width, @height = send("size_of_#{@format}", ir)
+    @width, @height = send("size_of_#{@format}", ir) if @format
   end
 
   # Image format
@@ -112,7 +110,7 @@ private
     when head =~ %r{/\* XPM \*/}                                  then :xpm
     when head[0, 4] == '8BPS'                                     then :psd
     when head[0, 3] =~ /[FC]WS/                                   then :swf
-    when head =~ SVG_R || (head =~ XML_R && ir[0, 4096][SVG_R])   then :svg
+    when head =~ SVG_R || (head =~ XML_R && ir[0, 4096] =~ SVG_R) then :svg
     when head[0, 2] =~ /\n[\0-\5]/                                then :pcx
     when head[0, 12] =~ /RIFF(?m:....)WEBP/                       then :webp
     when head[0, 4] == "\0\0\1\0"                                 then :ico
@@ -190,7 +188,7 @@ private
       offset += 1 until section_marker != ir[offset + 1, 1]
       raise FormatError, 'EOF in JPEG' if ir[offset, 1].nil?
 
-      _marker, code, length = ir[offset, 4].unpack('aCn')
+      code, length = ir[offset, 4].unpack('xCn')
       offset += 4
 
       if JPEG_CODE_CHECK.include?(code)
@@ -228,7 +226,7 @@ private
   def size_of_pam(ir)
     width = height = nil
     offset = 3
-    loop do
+    until width && height
       if ir[offset, 1] == '#'
         offset += 1 until ["\n", '', nil].include?(ir[offset, 1])
         offset += 1
@@ -247,7 +245,6 @@ private
           raise FormatError, "Unexpected data in PAM header: #{chunk.inspect}"
         end
         offset += $&.length
-        break if width && height
       end
     end
     [width, height]
