@@ -23,20 +23,26 @@ gem 'image_size', '~> 2.0'
 ## Usage
 
 ```ruby
-image_size = ImageSize.path('spec/test.jpg')
+image_size = ImageSize.path('spec/images/jpeg/436x429.jpeg')
 
 image_size.format       #=> :jpec
-image_size.width        #=> 320
-image_size.height       #=> 240
-image_size.w            #=> 320
-image_size.h            #=> 240
-image_size.size         #=> [320, 240]
+image_size.width        #=> 436
+image_size.height       #=> 429
+image_size.w            #=> 436
+image_size.h            #=> 429
+image_size.size         #=> [436, 429]
+image_size.size.to_s    #=> "436x429"
+"#{image_size.size}"    #=> "436x429"
+image_size.size.width   #=> 436
+image_size.size.height  #=> 429
+image_size.size.w       #=> 436
+image_size.size.h       #=> 429
 ```
 
 Or using `IO` object:
 
 ```ruby
-image_size = File.open('spec/test.jpg', 'rb'){ |fh| ImageSize.new(fh) }
+image_size = File.open('spec/images/jpeg/436x429.jpeg', 'rb'){ |fh| ImageSize.new(fh) }
 ```
 
 Any object responding to `read` and `eof?`:
@@ -68,14 +74,14 @@ So rewind if needed before passing to `ImageSize` and/or rewind after passing to
 ```ruby
 require 'image_size'
 
-File.open('spec/test.jpg', 'rb') do |fh|
+File.open('spec/images/jpeg/436x429.jpeg', 'rb') do |fh|
   image_size = ImageSize.new(fh)
 
   fh.rewind
   data = fh.read
 end
 
-File.open('spec/test.jpg', 'rb') do |fh|
+File.open('spec/images/jpeg/436x429.jpeg', 'rb') do |fh|
   data = fh.read
   fh.rewind
 

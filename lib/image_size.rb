@@ -13,6 +13,18 @@ class ImageSize
     def to_s
       join('x')
     end
+
+    # get first element
+    def width
+      self[0]
+    end
+    alias_method :w, :width
+
+    # get second element
+    def height
+      self[1]
+    end
+    alias_method :h, :height
   end
 
   class ImageReader # :nodoc:

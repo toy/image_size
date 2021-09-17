@@ -2,6 +2,8 @@
 
 ## unreleased
 
+* Add `w`/`width` and `h`/`height` accessors to `Size` [@toy](https://github.com/toy)
+
 ## v2.1.2 (2021-08-21)
 
 * Fix for pcx on big endian systems by forcing reading dimensions in little endian byte order [#15](https://github.com/toy/image_size/issues/15) [#16](https://github.com/toy/image_size/pull/16) [@mtasaka](https://github.com/mtasaka)
