@@ -28,8 +28,6 @@ class ImageSize
   end
 
   class ImageReader # :nodoc:
-    attr_reader :data
-
     def initialize(data_or_io)
       @io = if data_or_io.is_a?(String)
         StringIO.new(data_or_io)
@@ -342,7 +340,8 @@ private
 
   def size_of_svg(ir)
     attributes = {}
-    ir.data[SVG_R, 1].scan(/(\S+)=(?:'([^']*)'|"([^"]*)"|([^'"\s]*))/) do |name, v0, v1, v2|
+    svg_tag = ir[0, 1024][SVG_R, 1] || ir[0, 4096][SVG_R, 1]
+    svg_tag.scan(/(\S+)=(?:'([^']*)'|"([^"]*)"|([^'"\s]*))/) do |name, v0, v1, v2|
       attributes[name] = v0 || v1 || v2
     end
     dpi = self.class.dpi
