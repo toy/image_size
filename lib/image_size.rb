@@ -52,6 +52,30 @@ class ImageSize
       end
       @data[offset, length]
     end
+
+    def fetch(offset, length)
+      chunk = self[offset, length]
+
+      unless chunk && chunk.length == length
+        raise FormatError, "Expected #{length} bytes at offset #{offset}, got #{chunk.inspect}"
+      end
+
+      chunk
+    end
+
+    def unpack(offset, length, format)
+      fetch(offset, length).unpack(format)
+    end
+
+    if ''.respond_to?(:unpack1)
+      def unpack1(offset, length, format)
+        fetch(offset, length).unpack1(format)
+      end
+    else
+      def unpack1(offset, length, format)
+        fetch(offset, length).unpack(format)[0]
+      end
+    end
   end
 
   # Given path to image finds its format, width and height
@@ -127,7 +151,7 @@ private
       break if ['IDAT', 'IEND', nil].include?(type)
       return :apng if type == 'acTL'
 
-      length = ir[offset, 4].unpack('N')[0]
+      length = ir.unpack1(offset, 4, 'N')
       offset += 8 + length + 4
     end
     :png
@@ -154,7 +178,7 @@ private
   end
 
   def size_of_gif(ir)
-    ir[6, 4].unpack('vv')
+    ir.unpack(6, 4, 'vv')
   end
 
   def size_of_mng(ir)
@@ -162,7 +186,7 @@ private
       raise FormatError, 'MHDR not in place for MNG'
     end
 
-    ir[16, 8].unpack('NN')
+    ir.unpack(16, 8, 'NN')
   end
 
   def size_of_png(ir)
@@ -170,7 +194,7 @@ private
       raise FormatError, 'IHDR not in place for PNG'
     end
 
-    ir[16, 8].unpack('NN')
+    ir.unpack(16, 8, 'NN')
   end
   alias_method :size_of_apng, :size_of_png
 
@@ -188,11 +212,11 @@ private
       offset += 1 until section_marker != ir[offset + 1, 1]
       raise FormatError, 'EOF in JPEG' if ir[offset, 1].nil?
 
-      code, length = ir[offset, 4].unpack('xCn')
+      code, length = ir.unpack(offset, 4, 'xCn')
       offset += 4
 
       if JPEG_CODE_CHECK.include?(code)
-        return ir[offset + 1, 4].unpack('nn').reverse
+        return ir.unpack(offset + 1, 4, 'nn').reverse
       end
 
       offset += length - 2
@@ -200,11 +224,11 @@ private
   end
 
   def size_of_bmp(ir)
-    header_size = ir[14, 4].unpack('V')[0]
+    header_size = ir.unpack1(14, 4, 'V')
     if header_size == 12
-      ir[18, 4].unpack('vv')
+      ir.unpack(18, 4, 'vv')
     else
-      ir[18, 8].unpack('VV').map do |n|
+      ir.unpack(18, 8, 'VV').map do |n|
         if n > 0x7fff_ffff
           0x1_0000_0000 - n # absolute value of converted to signed
         else
@@ -268,23 +292,23 @@ private
   end
 
   def size_of_psd(ir)
-    ir[14, 8].unpack('NN').reverse
+    ir.unpack(14, 8, 'NN').reverse
   end
 
   def size_of_tiff(ir)
-    endian2b = ir[0, 4] == "II*\000" ? 'v' : 'n'
+    endian2b = ir.fetch(0, 4) == "II*\000" ? 'v' : 'n'
     endian4b = endian2b.upcase
     packspec = [nil, 'C', nil, endian2b, endian4b, nil, 'c', nil, endian2b, endian4b]
 
-    offset = ir[4, 4].unpack(endian4b)[0]
-    num_dirent = ir[offset, 2].unpack(endian2b)[0]
+    offset = ir.unpack1(4, 4, endian4b)
+    num_dirent = ir.unpack1(offset, 2, endian2b)
     offset += 2
     num_dirent = offset + (num_dirent * 12)
 
     width = height = nil
     until width && height
-      ifd = ir[offset, 12]
-      raise FormatError, 'Reached end of directory entries in TIFF' if ifd.nil? || offset > num_dirent
+      ifd = ir.fetch(offset, 12)
+      raise FormatError, 'Reached end of directory entries in TIFF' if offset > num_dirent
 
       tag, type = ifd.unpack(endian2b * 2)
       offset += 12
@@ -303,14 +327,14 @@ private
   end
 
   def size_of_pcx(ir)
-    parts = ir[4, 8].unpack('v4')
+    parts = ir.unpack(4, 8, 'v4')
     [parts[2] - parts[0] + 1, parts[3] - parts[1] + 1]
   end
 
   def size_of_swf(ir)
-    value_bit_length = ir[8, 1].unpack('B5').first.to_i(2)
+    value_bit_length = ir.unpack1(8, 1, 'B5').to_i(2)
     bit_length = 5 + (value_bit_length * 4)
-    rect_bits = ir[8, (bit_length / 8) + 1].unpack("B#{bit_length}").first
+    rect_bits = ir.unpack1(8, (bit_length / 8) + 1, "B#{bit_length}")
     values = rect_bits[5..-1].unpack("a#{value_bit_length}" * 4).map{ |bits| bits.to_i(2) }
     x_min, x_max, y_min, y_max = values
     [(x_max - x_min) / 20, (y_max - y_min) / 20]
@@ -339,19 +363,19 @@ private
   end
 
   def size_of_ico(ir)
-    ir[6, 2].unpack('CC').map{ |v| v.zero? ? 256 : v }
+    ir.unpack(6, 2, 'CC').map{ |v| v.zero? ? 256 : v }
   end
   alias_method :size_of_cur, :size_of_ico
 
   def size_of_webp(ir)
-    case ir[12, 4]
+    case ir.fetch(12, 4)
     when 'VP8 '
-      ir[26, 4].unpack('vv').map{ |v| v & 0x3fff }
+      ir.unpack(26, 4, 'vv').map{ |v| v & 0x3fff }
     when 'VP8L'
-      n = ir[21, 4].unpack('V')[0]
+      n = ir.unpack1(21, 4, 'V')
       [(n & 0x3fff) + 1, ((n >> 14) & 0x3fff) + 1]
     when 'VP8X'
-      w16, w8, h16, h8 = ir[24, 6].unpack('vCvC')
+      w16, w8, h16, h8 = ir.unpack(24, 6, 'vCvC')
       [(w16 | (w8 << 16)) + 1, (h16 | (h8 << 16)) + 1]
     end
   end
@@ -364,13 +388,13 @@ private
       break if stop && offset >= stop
       break if ir[offset, 4] == '' || ir[offset, 4].nil?
 
-      size = ir[offset, 4].unpack('N')[0]
-      type = ir[offset + 4, 4]
+      size = ir.unpack1(offset, 4, 'N')
+      type = ir.fetch(offset + 4, 4)
 
       data_offset = 8
       case size
       when 1
-        size = ir[offset, 8].unpack('Q>')[0]
+        size = ir.unpack1(offset, 8, 'Q>')
         data_offset = 16
         raise FormatError, "Unexpected xl-box size #{size}" if (1..15).include?(size)
       when 2..7
@@ -382,7 +406,7 @@ private
         offset += data_offset
         in_header = true
       elsif in_header && type == 'ihdr'
-        return ir[offset + data_offset, 8].unpack('NN').reverse
+        return ir.unpack(offset + data_offset, 8, 'NN').reverse
       else
         break if size.zero? # box to the end of file
 
@@ -393,6 +417,6 @@ private
   alias_method :size_of_jpx, :size_of_jp2
 
   def size_of_j2c(ir)
-    ir[8, 8].unpack('NN')
+    ir.unpack(8, 8, 'NN')
   end
 end

@@ -2,6 +2,7 @@
 
 ## unreleased
 
+* Raise `FormatError` whenever reading data returns less data than expected [#12](https://github.com/toy/image_size/issues/12) [@toy](https://github.com/toy)
 * Add `w`/`width` and `h`/`height` accessors to `Size` [@toy](https://github.com/toy)
 
 ## v2.1.2 (2021-08-21)
