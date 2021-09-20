@@ -2,7 +2,9 @@
 
 require 'rspec'
 require 'image_size'
+
 require 'tempfile'
+require 'shellwords'
 
 describe ImageSize do
   max_filesize = 16_384
@@ -50,13 +52,22 @@ describe ImageSize do
         end
       end
 
+      context 'given as unseekable IO' do
+        it 'gets format and dimensions' do
+          IO.popen(%W[cat #{path}].shelljoin, 'rb') do |io|
+            image_size = ImageSize.new(io)
+            expect(image_size).to have_attributes(attributes)
+            expect(io).not_to be_closed
+          end
+        end
+      end
+
       context 'given as StringIO' do
         it 'gets format and dimensions' do
           io = StringIO.new(file_data)
           image_size = ImageSize.new(io)
           expect(image_size).to have_attributes(attributes)
           expect(io).not_to be_closed
-          expect(io.pos).to_not be_zero
           io.rewind
           expect(io.read).to eq(file_data)
         end

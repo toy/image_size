@@ -1,7 +1,10 @@
 # encoding: BINARY
 # frozen_string_literal: true
 
-require 'stringio'
+require 'image_size/reader'
+require 'image_size/seekable_io_reader'
+require 'image_size/stream_io_reader'
+require 'image_size/string_reader'
 
 # Determine image format and size
 class ImageSize
@@ -27,58 +30,9 @@ class ImageSize
     alias_method :h, :height
   end
 
-  class ImageReader # :nodoc:
-    def initialize(data_or_io)
-      @io = if data_or_io.is_a?(String)
-        StringIO.new(data_or_io)
-      elsif data_or_io.respond_to?(:read) && data_or_io.respond_to?(:eof?)
-        data_or_io
-      else
-        raise ArgumentError, "expected data as String or an object responding to read and eof?, got #{data_or_io.class}"
-      end
-      @data = String.new # not frozen
-    end
-
-    CHUNK = 1024
-    def [](offset, length)
-      while !@io.eof? && @data.length < offset + length
-        data = @io.read(CHUNK)
-        break unless data
-
-        data.force_encoding(@data.encoding) if data.respond_to?(:encoding)
-        @data << data
-      end
-      @data[offset, length]
-    end
-
-    def fetch(offset, length)
-      chunk = self[offset, length]
-
-      unless chunk && chunk.length == length
-        raise FormatError, "Expected #{length} bytes at offset #{offset}, got #{chunk.inspect}"
-      end
-
-      chunk
-    end
-
-    def unpack(offset, length, format)
-      fetch(offset, length).unpack(format)
-    end
-
-    if ''.respond_to?(:unpack1)
-      def unpack1(offset, length, format)
-        fetch(offset, length).unpack1(format)
-      end
-    else
-      def unpack1(offset, length, format)
-        fetch(offset, length).unpack(format)[0]
-      end
-    end
-  end
-
   # Given path to image finds its format, width and height
   def self.path(path)
-    File.open(path, 'rb'){ |f| new(f) }
+    new(Pathname.new(path))
   end
 
   # Used for svg
@@ -93,9 +47,10 @@ class ImageSize
 
   # Given image as any class responding to read and eof? or data as String, finds its format and dimensions
   def initialize(data)
-    ir = ImageReader.new(data)
-    @format = detect_format(ir)
-    @width, @height = send("size_of_#{@format}", ir) if @format
+    Reader.open(data) do |ir|
+      @format = detect_format(ir)
+      @width, @height = send("size_of_#{@format}", ir) if @format
+    end
   end
 
   # Image format
