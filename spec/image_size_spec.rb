@@ -1,15 +1,35 @@
 # frozen_string_literal: true
 
 require 'rspec'
+
 require 'image_size'
+require 'image_size/uri_reader'
 
 require 'tempfile'
 require 'shellwords'
+require 'webrick'
 
 describe ImageSize do
+  before :all do
+    @server = WEBrick::HTTPServer.new({
+      :Logger => WEBrick::Log.new(StringIO.new),
+      :AccessLog => [],
+      :BindAddress => '127.0.0.1',
+      :Port => 0, # get the next available port
+      :DocumentRoot => '.',
+    })
+    @server_thread = Thread.new{ @server.start }
+    @server_base_url = URI("http://localhost:#{@server.config[:Port]}/")
+  end
+
+  after :all do
+    @server.shutdown
+    @server_thread.join
+  end
+
   max_filesize = 16_384
 
-  (Dir['spec/images/*/*.*'] + [__FILE__]).each do |path|
+  (Dir['spec/images/*/*.*'] + [__FILE__[%r{spec/.+?\z}]]).each do |path|
     filesize = File.size(path)
     warn "#{path} is too big #{filesize} (max #{max_filesize})" if filesize > max_filesize
 
@@ -92,6 +112,13 @@ describe ImageSize do
       context 'using path method' do
         it 'gets format and dimensions' do
           image_size = ImageSize.path(path)
+          expect(image_size).to have_attributes(attributes)
+        end
+      end
+
+      context 'fetching from webserver' do
+        it 'gets format and dimensions' do
+          image_size = ImageSize.url(@server_base_url + path)
           expect(image_size).to have_attributes(attributes)
         end
       end
