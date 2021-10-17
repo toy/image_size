@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## v3.0.0 (2021-10-17)
+
 * Read only required chunks of data for files and seekable IOs [@toy](https://github.com/toy)
 * Raise `FormatError` whenever reading data returns less data than expected [#12](https://github.com/toy/image_size/issues/12) [@toy](https://github.com/toy)
 * Add `w`/`width` and `h`/`height` accessors to `Size` [@toy](https://github.com/toy)
