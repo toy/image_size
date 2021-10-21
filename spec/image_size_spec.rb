@@ -19,7 +19,7 @@ describe ImageSize do
       :DocumentRoot => '.',
     })
     @server_thread = Thread.new{ @server.start }
-    @server_base_url = URI("http://localhost:#{@server.config[:Port]}/")
+    @server_base_url = URI("http://127.0.0.1:#{@server.config[:Port]}/")
   end
 
   after :all do
