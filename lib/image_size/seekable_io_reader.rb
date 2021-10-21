@@ -18,7 +18,8 @@ class ImageSize
       unless @chunks.key?(i)
         @io.seek((chunk_size * i) - @pos, IO::SEEK_CUR)
         data = @io.read(chunk_size)
-        @pos += data.length
+        @pos = chunk_size * i
+        @pos += data.length if data
         @chunks[i] = data
       end
 

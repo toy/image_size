@@ -2,6 +2,8 @@
 
 ## unreleased
 
+* Fix reading file chunks starting after EOF and reading chunks non-consecutively [toy/image_optim_rails#12](https://github.com/toy/image_optim_rails/issues/12) [@toy](https://github.com/toy)
+
 ## v3.0.0 (2021-10-17)
 
 * Read only required chunks of data for files and seekable IOs [@toy](https://github.com/toy)
