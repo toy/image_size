@@ -53,6 +53,9 @@ Style/EmptyCaseCondition:
 Style/Encoding:
   Enabled: false
 
+Style/FileRead:
+  Enabled: false
+
 Style/HashEachMethods:
   Enabled: true
 
