@@ -80,6 +80,9 @@ Style/ParallelAssignment:
 Style/SafeNavigation:
   Enabled: false
 
+Style/SlicingWithRange:
+  Enabled: false
+
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: comma
 
