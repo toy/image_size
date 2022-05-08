@@ -17,7 +17,7 @@ gem install image_size
 Add to your `Gemfile`:
 
 ```ruby
-gem 'image_size', '~> 2.0'
+gem 'image_size', '~> 3.0'
 ```
 
 ## Usage
