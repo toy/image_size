@@ -2,6 +2,8 @@
 
 ## unreleased
 
+* Fix handling empty files [#20](https://github.com/toy/image_size/issues/20) [@toy](https://github.com/toy)
+
 ## v3.0.1 (2021-10-21)
 
 * Fix reading file chunks starting after EOF and reading chunks non-consecutively [toy/image_optim_rails#12](https://github.com/toy/image_optim_rails/issues/12) [@toy](https://github.com/toy)

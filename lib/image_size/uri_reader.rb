@@ -34,6 +34,8 @@ class ImageSize
         @body = response.body
       when Net::HTTPPartialContent
         @chunks = { 0 => response.body }
+      when Net::HTTPRequestedRangeNotSatisfiable
+        @body = ''
       else
         raise "Unexpected response: #{response}"
       end

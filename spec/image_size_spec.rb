@@ -27,7 +27,8 @@ describe ImageSize do
     @server_thread.join
   end
 
-  (Dir['spec/images/*/*.*'] + [__FILE__[%r{spec/.+?\z}]]).each do |path|
+  Dir['spec/**/*'].each do |path|
+    next unless File.file?(path)
 
     describe "for #{path}" do
       let(:name){ File.basename(path) }
@@ -51,7 +52,7 @@ describe ImageSize do
         max_file_size = 16_384
 
         if file_size > max_file_size
-          fail "reduce resulting gem size, #{path} is too big (#{file_size} > #{max_file_size})"
+          raise "reduce resulting gem size, #{path} is too big (#{file_size} > #{max_file_size})"
         end
       end
 
@@ -70,7 +71,11 @@ describe ImageSize do
             image_size = ImageSize.new(io)
             expect(image_size).to have_attributes(attributes)
             expect(io).not_to be_closed
-            expect(io.pos).to_not be_zero
+            if file_size.zero?
+              expect(io.pos).to be_zero
+            else
+              expect(io.pos).to_not be_zero
+            end
             io.rewind
             expect(io.read).to eq(file_data)
           end
@@ -107,7 +112,11 @@ describe ImageSize do
             image_size = ImageSize.new(io)
             expect(image_size).to have_attributes(attributes)
             expect(io).not_to be_closed
-            expect(io.pos).to_not be_zero
+            if file_size.zero?
+              expect(io.pos).to be_zero
+            else
+              expect(io.pos).to_not be_zero
+            end
             io.rewind
             expect(io.read).to eq(file_data)
           end

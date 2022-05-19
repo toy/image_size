@@ -76,6 +76,7 @@ private
   def detect_format(ir)
     head = ir[0, 1024]
     case
+    when head.nil? || head.empty?                                 then nil
     when head[0, 6] =~ /GIF8[79]a/                                then :gif
     when head[0, 8] == "\211PNG\r\n\032\n"                        then detect_png_type(ir)
     when head[0, 8] == "\212MNG\r\n\032\n"                        then :mng

@@ -9,17 +9,17 @@
 # Offense count: 8
 # Configuration parameters: IgnoredMethods.
 Metrics/AbcSize:
-  Max: 43
+  Enabled: false
 
 # Offense count: 5
 # Configuration parameters: IgnoredMethods.
 Metrics/CyclomaticComplexity:
-  Max: 21
+  Enabled: false
 
 # Offense count: 2
 # Configuration parameters: IgnoredMethods.
 Metrics/PerceivedComplexity:
-  Max: 21
+  Enabled: false
 
 # Offense count: 8
 # Cop supports --auto-correct.
