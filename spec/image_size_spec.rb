@@ -27,11 +27,7 @@ describe ImageSize do
     @server_thread.join
   end
 
-  max_filesize = 16_384
-
   (Dir['spec/images/*/*.*'] + [__FILE__[%r{spec/.+?\z}]]).each do |path|
-    filesize = File.size(path)
-    warn "#{path} is too big #{filesize} (max #{max_filesize})" if filesize > max_filesize
 
     describe "for #{path}" do
       let(:name){ File.basename(path) }
@@ -49,6 +45,15 @@ describe ImageSize do
         }
       end
       let(:file_data){ File.open(path, 'rb', &:read) }
+      let(:file_size){ file_data.length }
+
+      before do
+        max_file_size = 16_384
+
+        if file_size > max_file_size
+          fail "reduce resulting gem size, #{path} is too big (#{file_size} > #{max_file_size})"
+        end
+      end
 
       context 'given as data' do
         it 'gets format and dimensions' do
