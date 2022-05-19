@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## v3.0.2 (2022-05-19)
+
 * Fix handling empty files [#20](https://github.com/toy/image_size/issues/20) [@toy](https://github.com/toy)
 
 ## v3.0.1 (2021-10-21)
