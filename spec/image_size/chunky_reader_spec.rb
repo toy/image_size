@@ -56,9 +56,11 @@ describe ImageSize::ChunkyReader do
               offsets.each do |offset_b|
                 length = offset_b - offset
                 expect(reader[offset, length]).to eq(data[offset, length]),
-                                                  "for offset #{offset} and length #{length}\n"\
-                                                  "expected: #{data[offset, length].inspect}\n"\
-                                                  "     got: #{reader[offset, length].inspect}"
+                                                  [
+                                                    "for offset #{offset} and length #{length}",
+                                                    "expected: #{data[offset, length].inspect}",
+                                                    "     got: #{reader[offset, length].inspect}",
+                                                  ].join("\n")
               end
             end
           end
