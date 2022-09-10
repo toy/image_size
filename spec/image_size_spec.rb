@@ -7,24 +7,16 @@ require 'image_size/uri_reader'
 
 require 'tempfile'
 require 'shellwords'
-require 'webrick'
+
+require 'test_server'
 
 describe ImageSize do
   before :all do
-    @server = WEBrick::HTTPServer.new({
-      :Logger => WEBrick::Log.new(StringIO.new),
-      :AccessLog => [],
-      :BindAddress => '127.0.0.1',
-      :Port => 0, # get the next available port
-      :DocumentRoot => '.',
-    })
-    @server_thread = Thread.new{ @server.start }
-    @server_base_url = URI("http://127.0.0.1:#{@server.config[:Port]}/")
+    @server = TestServer.new
   end
 
   after :all do
-    @server.shutdown
-    @server_thread.join
+    @server.finish
   end
 
   Dir['spec/**/*'].each do |path|
@@ -131,9 +123,54 @@ describe ImageSize do
       end
 
       context 'fetching from webserver' do
-        it 'gets format and dimensions' do
-          image_size = ImageSize.url(@server_base_url + path)
-          expect(image_size).to have_attributes(attributes)
+        let(:file_url){ @server.base_url + path }
+
+        context 'supporting range' do
+          context 'without redirects' do
+            it 'gets format and dimensions' do
+              image_size = ImageSize.url(file_url)
+              expect(image_size).to have_attributes(attributes)
+            end
+          end
+
+          context 'with redirects' do
+            it 'gets format and dimensions' do
+              image_size = ImageSize.url("#{file_url}?redirect=5")
+              expect(image_size).to have_attributes(attributes)
+            end
+          end
+
+          context 'with too many redirects' do
+            it 'gets format and dimensions' do
+              expect do
+                ImageSize.url("#{file_url}?redirect=6")
+              end.to raise_error(/Too many redirects/)
+            end
+          end
+        end
+
+        context 'not supporting range' do
+          context 'without redirects' do
+            it 'gets format and dimensions' do
+              image_size = ImageSize.url("#{file_url}?ignore_range")
+              expect(image_size).to have_attributes(attributes)
+            end
+          end
+
+          context 'with redirects' do
+            it 'gets format and dimensions' do
+              image_size = ImageSize.url("#{file_url}?ignore_range&redirect=5")
+              expect(image_size).to have_attributes(attributes)
+            end
+          end
+
+          context 'with too many redirects' do
+            it 'gets format and dimensions' do
+              expect do
+                ImageSize.url("#{file_url}?ignore_range&redirect=6")
+              end.to raise_error(/Too many redirects/)
+            end
+          end
         end
       end
     end

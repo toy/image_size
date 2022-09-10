@@ -6,67 +6,103 @@ require 'image_size/chunky_reader'
 require 'net/https'
 require 'uri'
 
-# This is a hacky experiment and not part of public API
+# Experimental, not yet part of stable API
 #
-# It adds ability to fetch size of image from http server while downloading only
-# needed chunks if the server recognises Range header
+# It adds ability to fetch image meta from HTTP server while downloading only
+# needed chunks if the server recognises Range header, otherwise fetches only
+# required amount of data
 class ImageSize
-  class URIReader # :nodoc:
-    include ChunkyReader
+  module URIReader # :nodoc:
+    module HTTPChunkyReader # :nodoc:
+      include ChunkyReader
 
-    def initialize(uri, redirects = 5)
-      if !@http || @http.address != uri.host || @http.port != uri.port
-        @http.finish if @http
-        @http = Net::HTTP.new(uri.host, uri.port)
-        @http.use_ssl = true if uri.scheme == 'https'
-        @http.start
-      end
-
-      @request_uri = uri.request_uri
-      response = request_chunk(0)
-
-      case response
-      when Net::HTTPRedirection
-        raise "Too many redirects: #{response['location']}" unless redirects > 0
-
-        initialize(uri + response['location'], redirects - 1)
-      when Net::HTTPOK
-        @body = response.body
-      when Net::HTTPPartialContent
-        @chunks = { 0 => response.body }
-      when Net::HTTPRequestedRangeNotSatisfiable
-        @body = ''
-      else
-        raise "Unexpected response: #{response}"
+      def chunk_range_header(i)
+        { 'Range' => "bytes=#{chunk_size * i}-#{(chunk_size * (i + 1)) - 1}" }
       end
     end
 
-    def [](offset, length)
-      if @body
-        @body[offset, length]
-      else
-        super
-      end
-    end
+    class BodyReader # :nodoc:
+      include ChunkyReader
 
-    def chunk(i)
-      unless @chunks.key?(i)
-        response = request_chunk(i)
-        case response
-        when Net::HTTPPartialContent
-          @chunks[i] = response.body
-        else
-          raise "Unexpected response: #{response}"
+      def initialize(response)
+        @body = String.new
+        @body_reader = response.to_enum(:read_body)
+      end
+
+      def [](offset, length)
+        if @body_reader
+          begin
+            @body << @body_reader.next while @body.length < offset + length
+          rescue StopIteration, IOError
+            @body_reader = nil
+          end
         end
-      end
 
-      @chunks[i]
+        @body[offset, length]
+      end
     end
 
-  private
+    class RangeReader # :nodoc:
+      include HTTPChunkyReader
 
-    def request_chunk(i)
-      @http.get(@request_uri, 'Range' => "bytes=#{chunk_size * i}-#{(chunk_size * (i + 1)) - 1}")
+      def initialize(http, request_uri, chunk0)
+        @http = http
+        @request_uri = request_uri
+        @chunks = { 0 => chunk0 }
+      end
+
+      def chunk(i)
+        unless @chunks.key?(i)
+          response = @http.get(@request_uri, chunk_range_header(i))
+          case response
+          when Net::HTTPPartialContent
+            @chunks[i] = response.body
+          else
+            raise "Unexpected response: #{response}"
+          end
+        end
+
+        @chunks[i]
+      end
+    end
+
+    class << self
+      include HTTPChunkyReader
+
+      def open(uri, max_redirects = 5)
+        http = nil
+        (max_redirects + 1).times do
+          unless http && http.address == uri.host && http.port == uri.port
+            http.finish if http
+
+            http = Net::HTTP.new(uri.host, uri.port)
+            http.use_ssl = true if uri.scheme == 'https'
+            http.start
+          end
+
+          response = http.request_get(uri.request_uri, chunk_range_header(0)) do |response_with_unread_body|
+            case response_with_unread_body
+            when Net::HTTPOK
+              return yield BodyReader.new(response_with_unread_body)
+            end
+          end
+
+          case response
+          when Net::HTTPRedirection
+            uri += response['location']
+          when Net::HTTPPartialContent
+            return yield RangeReader.new(http, uri.request_uri, response.body)
+          when Net::HTTPRequestedRangeNotSatisfiable
+            return yield StringReader.new('')
+          else
+            raise "Unexpected response: #{response}"
+          end
+        end
+
+        raise "Too many redirects: #{uri}"
+      ensure
+        http.finish if http.started?
+      end
     end
   end
 
@@ -74,7 +110,7 @@ class ImageSize
     class << self
       def open_with_uri(input, &block)
         if input.is_a?(URI)
-          yield URIReader.new(input)
+          URIReader.open(input, &block)
         else
           open_without_uri(input, &block)
         end
