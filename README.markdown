@@ -54,7 +54,7 @@ require 'image_size'
 image_size = ImageSize.new(ARGF)
 ```
 
-Works with `open-uri` if needed:
+Works with `open-uri`, see [experimental HTTP server interface below](#experimental-fetch-image-meta-from-http-server):
 
 ```ruby
 require 'image_size'
@@ -88,6 +88,55 @@ File.open('spec/images/jpeg/436x429.jpeg', 'rb') do |fh|
 
   image_size = ImageSize.new(fh)
 end
+```
+
+### Experimental: fetch image meta from HTTP server
+
+If server recognises Range header, only needed chunks will be fetched even for TIFF images, otherwise required amount
+of data will be fetched, in most cases first few kilobytes (TIFF images is an exception).
+
+```ruby
+require 'image_size'
+require 'image_size/uri_reader'
+
+url = 'http://upload.wikimedia.org/wikipedia/commons/b/b4/Mardin_1350660_1350692_33_images.jpg'
+p ImageSize.url(url).size
+```
+
+This interface is as fast as dedicated gem fastimage for images with meta information in the header:
+
+```ruby
+url = 'http://upload.wikimedia.org/wikipedia/commons/b/b4/Mardin_1350660_1350692_33_images.jpg'
+puts Benchmark.measure{ p FastImage.size(url) }
+```
+```
+[9545, 6623]
+  0.004176   0.001974   0.006150 (  0.282889)
+```
+```ruby
+puts Benchmark.measure{ p ImageSize.url(url).size }
+```
+```
+[9545, 6623]
+  0.005604   0.001406   0.007010 (  0.238629)
+```
+
+And considerably faster for images with meta information at the end of file:
+
+```ruby
+url = "https://upload.wikimedia.org/wikipedia/commons/c/c7/Curiosity%27s_Vehicle_System_Test_Bed_%28VSTB%29_Rover_%28PIA15876%29.tif"
+puts Benchmark.measure{ p FastImage.size(url) }
+```
+```
+[7360, 4912]
+  0.331284   0.247295   0.578579 (  6.027051)
+```
+```ruby
+puts Benchmark.measure{ p ImageSize.url(url).size }
+```
+```
+[7360, 4912]
+  0.006247   0.001045   0.007292 (  0.197631)
 ```
 
 ## Licence

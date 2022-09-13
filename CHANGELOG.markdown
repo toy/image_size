@@ -2,6 +2,9 @@
 
 ## unreleased
 
+* Document experimental fetching from http server [#18](https://github.com/toy/image_size/issues/18) [@toy](https://github.com/toy)
+* Improve experimental fetching of image meta from http server by reading only required amount of data when server does not support range header [@toy](https://github.com/toy)
+
 ## v3.0.2 (2022-05-19)
 
 * Fix handling empty files [#20](https://github.com/toy/image_size/issues/20) [@toy](https://github.com/toy)
@@ -15,6 +18,7 @@
 * Read only required chunks of data for files and seekable IOs [@toy](https://github.com/toy)
 * Raise `FormatError` whenever reading data returns less data than expected [#12](https://github.com/toy/image_size/issues/12) [@toy](https://github.com/toy)
 * Add `w`/`width` and `h`/`height` accessors to `Size` [@toy](https://github.com/toy)
+* Experimental efficient fetching of image meta from http server supporting range [@toy](https://github.com/toy)
 
 ## v2.1.2 (2021-08-21)
 
