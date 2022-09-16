@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## v3.1.0 (2022-09-17)
+
 * Document experimental fetching from http server [#18](https://github.com/toy/image_size/issues/18) [@toy](https://github.com/toy)
 * Improve experimental fetching of image meta from http server by reading only required amount of data when server does not support range header [@toy](https://github.com/toy)
 
