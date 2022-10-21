@@ -95,6 +95,7 @@ private
     when head[0, 4] == "\0\0\2\0"                                 then :cur
     when head[0, 12] == "\0\0\0\fjP  \r\n\207\n"                  then detect_jpeg2000_type(ir)
     when head[0, 4] == "\377O\377Q"                               then :j2c
+    when head[0, 4] == "\1\0\0\0"                                 then :emf
     end
   end
 
@@ -373,5 +374,9 @@ private
 
   def size_of_j2c(ir)
     ir.unpack(8, 8, 'NN')
+  end
+
+  def size_of_emf(ir)
+    [ir.unpack1(16, 4, 'L<'), ir.unpack1(20, 4, 'L<')]
   end
 end
