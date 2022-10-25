@@ -95,7 +95,7 @@ private
     when head[0, 4] == "\0\0\2\0"                                 then :cur
     when head[0, 12] == "\0\0\0\fjP  \r\n\207\n"                  then detect_jpeg2000_type(ir)
     when head[0, 4] == "\377O\377Q"                               then :j2c
-    when head[0, 4] == "\1\0\0\0"                                 then :emf
+    when head[0, 4] == "\1\0\0\0" && head[40, 4] == ' EMF'        then :emf
     end
   end
 
@@ -377,6 +377,10 @@ private
   end
 
   def size_of_emf(ir)
-    [ir.unpack1(16, 4, 'L<'), ir.unpack1(20, 4, 'L<')]
+    left, top, right, bottom = ir.unpack(24, 16, 'L<*')
+    dpi = self.class.dpi
+    [right - left + 1, bottom - top + 1].map do |n|
+      (n.to_f * dpi / 2540).round
+    end
   end
 end
