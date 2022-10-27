@@ -19,6 +19,26 @@ describe ImageSize do
     @server.finish
   end
 
+  def supported_formats
+    ImageSize.private_instance_methods.map{ |name| name[/\Asize_of_(.*)\z/, 1] }.compact.sort
+  end
+
+  describe 'README' do
+    let(:readme){ File.read('README.markdown') }
+
+    it 'lists all supported formats' do
+      expect(readme[/^Formats: .*$/]).to eq("Formats: #{supported_formats.map{ |format| "`#{format}`" }.join(', ')}.")
+    end
+  end
+
+  describe 'gemspec' do
+    let(:gemspec){ Gem::Specification.load('image_size.gemspec') }
+
+    it 'lists all supported formats in description' do
+      expect(gemspec.description).to eq("Measure following file dimensions: #{supported_formats.join(', ')}")
+    end
+  end
+
   Dir['spec/**/*'].each do |path|
     next unless File.file?(path)
 
