@@ -382,8 +382,7 @@ private
   def size_of_emf(ir)
     left, top, right, bottom =
       if RUBY_VERSION < '1.9'
-        ir.unpack(24, 16, 'V*')
-          .map{ |u| u < EMF_SMAX ? u : u - EMF_UMAX }
+        ir.unpack(24, 16, 'V*').map{ |u| u < EMF_SMAX ? u : u - EMF_UMAX }
       else
         ir.unpack(24, 16, 'L<*')
       end
