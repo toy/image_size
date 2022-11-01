@@ -376,8 +376,17 @@ private
     ir.unpack(8, 8, 'NN')
   end
 
+  EMF_UMAX = 256**4
+  EMF_SMAX = EMF_UMAX / 2
+
   def size_of_emf(ir)
-    left, top, right, bottom = ir.unpack(24, 16, 'L<*')
+    left, top, right, bottom =
+      if RUBY_VERSION < '1.9'
+        ir.unpack(24, 16, 'V*')
+          .map{ |u| u < EMF_SMAX ? u : u - EMF_UMAX }
+      else
+        ir.unpack(24, 16, 'L<*')
+      end
     dpi = self.class.dpi
     [right - left + 1, bottom - top + 1].map do |n|
       (n.to_f * dpi / 2540).round
