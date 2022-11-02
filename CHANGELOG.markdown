@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## v3.2.0 (2022-11-03)
+
 * Support `EMF` images [#21](https://github.com/toy/image_size/pull/21) [@opoudjis](https://github.com/opoudjis)
 
 ## v3.1.0 (2022-09-17)
