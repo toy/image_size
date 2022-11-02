@@ -95,6 +95,7 @@ private
     when head[0, 4] == "\0\0\2\0"                                 then :cur
     when head[0, 12] == "\0\0\0\fjP  \r\n\207\n"                  then detect_jpeg2000_type(ir)
     when head[0, 4] == "\377O\377Q"                               then :j2c
+    when head[0, 4] == "\1\0\0\0" && head[40, 4] == ' EMF'        then :emf
     end
   end
 
@@ -373,5 +374,21 @@ private
 
   def size_of_j2c(ir)
     ir.unpack(8, 8, 'NN')
+  end
+
+  EMF_UMAX = 256**4
+  EMF_SMAX = EMF_UMAX / 2
+
+  def size_of_emf(ir)
+    left, top, right, bottom =
+      if RUBY_VERSION < '1.9'
+        ir.unpack(24, 16, 'V*').map{ |u| u < EMF_SMAX ? u : u - EMF_UMAX }
+      else
+        ir.unpack(24, 16, 'L<*')
+      end
+    dpi = self.class.dpi
+    [right - left + 1, bottom - top + 1].map do |n|
+      (n.to_f * dpi / 2540).round
+    end
   end
 end
