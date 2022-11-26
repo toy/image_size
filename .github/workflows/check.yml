@@ -23,6 +23,7 @@ jobs:
         - jruby-9.1
         - jruby-9.2
         - jruby-9.3
+        - jruby-9.4
       fail-fast: false
     steps:
     - uses: actions/checkout@v2
