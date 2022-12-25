@@ -25,7 +25,7 @@ jobs:
         - jruby-9.4
       fail-fast: false
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: "${{ matrix.ruby }}"
@@ -41,7 +41,7 @@ jobs:
         - rspec/ci:1.9.3
       fail-fast: false
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: bundle install
     - run: bundle exec rspec --format documentation
   windows:
@@ -56,7 +56,7 @@ jobs:
         - '3.2'
       fail-fast: false
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: "${{ matrix.ruby }}"
