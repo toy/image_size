@@ -107,7 +107,7 @@ private
       return :apng if type == 'acTL'
 
       length = ir.unpack1(offset, 4, 'N')
-      offset += 8 + length + 4
+      offset += length + 8 + 4
     end
     :png
   end
@@ -126,7 +126,7 @@ private
 
     # using xl-box would be weird, but doesn't seem to contradict specification
     skip = ir[12, 4] == "\0\0\0\1" ? 16 : 8
-    case ir[12 + skip, 4]
+    case ir[skip + 12, 4]
     when 'jp2 ' then :jp2
     when 'jpx ' then :jpx
     end
@@ -288,7 +288,7 @@ private
 
   def size_of_swf(ir)
     value_bit_length = ir.unpack1(8, 1, 'B5').to_i(2)
-    bit_length = 5 + (value_bit_length * 4)
+    bit_length = (value_bit_length * 4) + 5
     rect_bits = ir.unpack1(8, (bit_length / 8) + 1, "B#{bit_length}")
     values = rect_bits[5..-1].unpack("a#{value_bit_length}" * 4).map{ |bits| bits.to_i(2) }
     x_min, x_max, y_min, y_max = values
