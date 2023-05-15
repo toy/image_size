@@ -349,9 +349,9 @@ private
       data_offset = 8
       case size
       when 1
-        size = ir.unpack1(offset, 8, 'Q>')
+        size = ir.unpack1(offset + 8, 8, 'Q>')
         data_offset = 16
-        raise FormatError, "Unexpected xl-box size #{size}" if (1..15).include?(size)
+        raise FormatError, "Unexpected xl-box size #{size}" if size < 16
       when 2..7
         raise FormatError, "Reserved box size #{size}"
       end

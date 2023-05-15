@@ -2,6 +2,8 @@
 
 ## unreleased
 
+* Fix handling `JPEG 2000` 64 bit size boxes [@toy](https://github.com/toy)
+
 ## v3.2.0 (2022-11-03)
 
 * Support `EMF` images [#21](https://github.com/toy/image_size/pull/21) [@opoudjis](https://github.com/opoudjis)
