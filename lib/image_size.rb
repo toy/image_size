@@ -1,6 +1,7 @@
 # encoding: BINARY
 # frozen_string_literal: true
 
+require 'image_size/format_error'
 require 'image_size/reader'
 require 'image_size/seekable_io_reader'
 require 'image_size/stream_io_reader'
@@ -8,8 +9,6 @@ require 'image_size/string_reader'
 
 # Determine image format and size
 class ImageSize
-  class FormatError < StandardError; end
-
   # Array joining with 'x'
   class Size < Array
     # join using 'x'
