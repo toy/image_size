@@ -76,20 +76,20 @@ private
     head = ir[0, 1024]
     case
     when head.nil? || head.empty?                                 then nil
-    when head[0, 6] =~ /GIF8[79]a/                                then :gif
+    when head[0, 6] =~ /\AGIF8[79]a\z/                            then :gif
     when head[0, 8] == "\211PNG\r\n\032\n"                        then detect_png_type(ir)
     when head[0, 8] == "\212MNG\r\n\032\n"                        then :mng
     when head[0, 2] == "\377\330"                                 then :jpeg
     when head[0, 2] == 'BM'                                       then :bmp
-    when head[0, 3] =~ /P[1-6]\s|P7\n/                            then detect_pnm_type(ir)
+    when head[0, 3] =~ /\AP([1-6]\s|7\n)\z/                       then detect_pnm_type(ir)
     when head =~ /\#define\s+\S+\s+\d+/                           then :xbm
     when %W[II*\0 MM\0*].include?(head[0, 4])                     then :tiff
     when head =~ %r{/\* XPM \*/}                                  then :xpm
     when head[0, 4] == '8BPS'                                     then :psd
-    when head[0, 3] =~ /[FC]WS/                                   then :swf
+    when head[0, 3] =~ /\A[FC]WS\z/                               then :swf
     when head =~ SVG_R || (head =~ XML_R && ir[0, 4096] =~ SVG_R) then :svg
     when head[0, 2] =~ /\n[\0-\5]/                                then :pcx
-    when head[0, 12] =~ /RIFF(?m:....)WEBP/                       then :webp
+    when head[0, 12] =~ /\ARIFF(?m:....)WEBP\z/                   then :webp
     when head[0, 4] == "\0\0\1\0"                                 then :ico
     when head[0, 4] == "\0\0\2\0"                                 then :cur
     when head[0, 12] == "\0\0\0\fjP  \r\n\207\n"                  then detect_jpeg2000_type(ir)
