@@ -4,7 +4,7 @@
 
 # image_size
 
-Measure image size using pure Ruby.
+Measure image size/dimensions using pure Ruby.
 Formats: `apng`, `bmp`, `cur`, `emf`, `gif`, `ico`, `j2c`, `jp2`, `jpeg`, `jpx`, `mng`, `pam`, `pbm`, `pcx`, `pgm`, `png`, `ppm`, `psd`, `svg`, `swf`, `tiff`, `webp`, `xbm`, `xpm`.
 
 ## Installation
