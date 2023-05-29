@@ -5,6 +5,19 @@ require 'stringio'
 
 class ImageSize
   module Reader # :nodoc:
+    class Stream # :nodoc:
+      def initialize(reader, offset)
+        @reader = reader
+        @offset = offset
+      end
+
+      def unpack1(length, format)
+        result = @reader.unpack1(@offset, length, format)
+        @offset += length
+        result
+      end
+    end
+
     class << self
       def open(input)
         case
@@ -59,6 +72,10 @@ class ImageSize
       def unpack1(offset, length, format)
         fetch(offset, length).unpack(format)[0]
       end
+    end
+
+    def stream(offset)
+      Stream.new(self, offset)
     end
   end
 end

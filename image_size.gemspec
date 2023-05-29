@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.name        = 'image_size'
   s.version     = '3.2.0'
   s.summary     = %q{Measure image size/dimensions using pure Ruby}
-  s.description = %q{Measure following file dimensions: apng, bmp, cur, emf, gif, ico, j2c, jp2, jpeg, jpx, mng, pam, pbm, pcx, pgm, png, ppm, psd, svg, swf, tiff, webp, xbm, xpm}
+  s.description = %q{Measure following file dimensions: apng, avif, bmp, cur, emf, gif, heic, heif, ico, j2c, jp2, jpeg, jpx, mng, pam, pbm, pcx, pgm, png, ppm, psd, svg, swf, tiff, webp, xbm, xpm}
   s.homepage    = "https://github.com/toy/#{s.name}"
   s.authors     = ['Keisuke Minami', 'Ivan Kuchin']
   s.license     = 'Ruby'

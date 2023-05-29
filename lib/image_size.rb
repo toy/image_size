@@ -96,6 +96,8 @@ private
     when head[0, 12] == "\0\0\0\fjP  \r\n\207\n"                  then detect_jpeg2000_type(ir)
     when head[0, 4] == "\377O\377Q"                               then :j2c
     when head[0, 4] == "\1\0\0\0" && head[40, 4] == ' EMF'        then :emf
+    when head[4, 8] =~ /\Aftypavi[fs]\z/                          then :avif
+    when head[4, 8] =~ /\Aftyp(hei[cs]|mif[12]|msf1)\z/           then :heic
     end
   end
 
@@ -366,4 +368,66 @@ private
       (n.to_f * dpi / 2540).round
     end
   end
+
+  HEIF_WALKER = ImageSize::ISOBMFF.new(
+    :recurse => %w[meta iprp ipco],
+    :full => %w[meta hdlr pitm ipma ispe],
+    :last => %w[meta]
+  )
+  def size_of_heif(ir)
+    pitm = nil
+    ipma = nil
+    ispes = {}
+    claps = {}
+    irots = {}
+
+    HEIF_WALKER.recurse(ir) do |box, _path|
+      case box.type
+      when 'hdlr'
+        raise FormatError, "hdlr box too small (#{box.data_size})" if box.data_size < 8
+
+        return nil unless ir[box.data_offset + 4, 4] == 'pict'
+      when 'pitm'
+        raise FormatError, 'second pitm box encountered' if pitm
+
+        pitm = box.version == 0 ? ir.unpack1(box.data_offset, 2, 'n') : ir.unpack1(box.data_offset, 4, 'N')
+      when 'ipma'
+        stream = ir.stream(box.data_offset)
+
+        property_index_16b = (box.flags & 1) == 1
+
+        ipma ||= {}
+        stream.unpack1(4, 'N').times do
+          item_id = box.version == 0 ? stream.unpack1(2, 'n') : stream.unpack1(4, 'N')
+          ipma[item_id] ||= Array.new(stream.unpack1(1, 'C')) do
+            property_index_16b ? stream.unpack1(2, 'n') & 0x7fff : stream.unpack1(1, 'C') & 0x7f
+          end
+        end
+      when 'ispe'
+        ispes[box.index] ||= ir.unpack(box.data_offset, 8, 'NN')
+      when 'clap'
+        width_n, width_d, height_n, height_d = ir.unpack(box.data_offset, 16, 'N4')
+        claps[box.index] ||= [Rational(width_n, width_d).round, Rational(height_n, height_d).round]
+      when 'irot'
+        irots[box.index] ||= ir.unpack1(box.data_offset, 1, 'C') & 0b11
+      end
+    end
+
+    return unless ipma
+
+    properties = ipma[pitm || ipma.keys.min]
+    return unless properties
+
+    dimensions = claps.values_at(*properties).compact.first || ispes.values_at(*properties).compact.first
+    return unless dimensions
+
+    irot = irots.values_at(*properties).compact.first
+    if irot && irot.odd?
+      dimensions.reverse
+    else
+      dimensions
+    end
+  end
+  alias_method :size_of_avif, :size_of_heif
+  alias_method :size_of_heic, :size_of_heif
 end
