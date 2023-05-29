@@ -36,7 +36,7 @@ class ImageSize
       end
     end
 
-    S64_OVERFLOW = 2**63
+    S64_OVERFLOW = 1 << 63
 
     def initialize(options = {})
       @full = options.fetch(:full, []).to_set

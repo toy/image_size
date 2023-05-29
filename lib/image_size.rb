@@ -1,6 +1,7 @@
 # encoding: BINARY
 # frozen_string_literal: true
 
+require 'image_size/isobmff'
 require 'image_size/format_error'
 require 'image_size/reader'
 require 'image_size/seekable_io_reader'
@@ -335,38 +336,13 @@ private
     end
   end
 
+  JP2_WALKER = ImageSize::ISOBMFF.new(
+    :recurse => %w[jp2h],
+    :last => %w[jp2h]
+  )
   def size_of_jp2(ir)
-    offset = 12
-    stop = nil
-    in_header = false
-    loop do
-      break if stop && offset >= stop
-      break if ir[offset, 4] == '' || ir[offset, 4].nil?
-
-      size = ir.unpack1(offset, 4, 'N')
-      type = ir.fetch(offset + 4, 4)
-
-      data_offset = 8
-      case size
-      when 1
-        size = ir.unpack1(offset + 8, 8, 'Q>')
-        data_offset = 16
-        raise FormatError, "Unexpected xl-box size #{size}" if size < 16
-      when 2..7
-        raise FormatError, "Reserved box size #{size}"
-      end
-
-      if type == 'jp2h'
-        stop = offset + size unless size.zero?
-        offset += data_offset
-        in_header = true
-      elsif in_header && type == 'ihdr'
-        return ir.unpack(offset + data_offset, 8, 'NN').reverse
-      else
-        break if size.zero? # box to the end of file
-
-        offset += size
-      end
+    JP2_WALKER.recurse(ir) do |box|
+      return ir.unpack(box.data_offset, 8, 'NN').reverse if box.type == 'ihdr'
     end
   end
   alias_method :size_of_jpx, :size_of_jp2
