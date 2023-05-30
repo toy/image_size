@@ -144,4 +144,4 @@ puts Benchmark.measure{ p ImageSize.url(url).size }
 This code is free to use under the terms of the [Ruby's licence](LICENSE.txt).
 
 Original author: Keisuke Minami <keisuke@rccn.com>.\
-Further development 2010-2022 Ivan Kuchin https://github.com/toy/image_size
+Further development 2010-2023 Ivan Kuchin https://github.com/toy/image_size

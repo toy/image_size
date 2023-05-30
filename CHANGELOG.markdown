@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## v3.3.0 (2023-05-30)
+
 * Support `HEIF` (`HEIC` and `AVIF`) images [#19](https://github.com/toy/image_size/issues/19) [@toy](https://github.com/toy)
 * Fix handling `JPEG 2000` 64 bit size boxes [@toy](https://github.com/toy)
 
