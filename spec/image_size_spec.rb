@@ -10,6 +10,10 @@ require 'shellwords'
 
 require 'test_server'
 
+RSpec.configure do |config|
+  config.order = :random
+end
+
 describe ImageSize do
   before :all do
     @server = TestServer.new
