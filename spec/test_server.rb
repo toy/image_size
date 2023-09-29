@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'webrick'
+require 'stringio'
 
 class TestServer
   attr_reader :base_url
