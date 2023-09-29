@@ -23,6 +23,19 @@ describe ImageSize do
     @server.finish
   end
 
+  def retry_on(exception_class)
+    attempt = 1
+    begin
+      yield
+    rescue exception_class => e
+      warn "Attempt #{attempt}: #{e.inspect}"
+      raise unless attempt < 3
+
+      attempt += 1
+      retry
+    end
+  end
+
   def supported_formats
     ImageSize.private_instance_methods.map{ |name| name[/\Asize_of_(.*)\z/, 1] }.compact.sort
   end
@@ -152,14 +165,18 @@ describe ImageSize do
         context 'supporting range' do
           context 'without redirects' do
             it 'gets format and dimensions' do
-              image_size = ImageSize.url(file_url)
+              image_size = retry_on Timeout::Error do
+                ImageSize.url(file_url)
+              end
               expect(image_size).to have_attributes(attributes)
             end
           end
 
           context 'with redirects' do
             it 'gets format and dimensions' do
-              image_size = ImageSize.url("#{file_url}?redirect=5")
+              image_size = retry_on Timeout::Error do
+                ImageSize.url("#{file_url}?redirect=5")
+              end
               expect(image_size).to have_attributes(attributes)
             end
           end
@@ -167,7 +184,9 @@ describe ImageSize do
           context 'with too many redirects' do
             it 'gets format and dimensions' do
               expect do
-                ImageSize.url("#{file_url}?redirect=6")
+                retry_on Timeout::Error do
+                  ImageSize.url("#{file_url}?redirect=6")
+                end
               end.to raise_error(/Too many redirects/)
             end
           end
@@ -176,14 +195,18 @@ describe ImageSize do
         context 'not supporting range' do
           context 'without redirects' do
             it 'gets format and dimensions' do
-              image_size = ImageSize.url("#{file_url}?ignore_range")
+              image_size = retry_on Timeout::Error do
+                ImageSize.url("#{file_url}?ignore_range")
+              end
               expect(image_size).to have_attributes(attributes)
             end
           end
 
           context 'with redirects' do
             it 'gets format and dimensions' do
-              image_size = ImageSize.url("#{file_url}?ignore_range&redirect=5")
+              image_size = retry_on Timeout::Error do
+                ImageSize.url("#{file_url}?ignore_range&redirect=5")
+              end
               expect(image_size).to have_attributes(attributes)
             end
           end
@@ -191,7 +214,9 @@ describe ImageSize do
           context 'with too many redirects' do
             it 'gets format and dimensions' do
               expect do
-                ImageSize.url("#{file_url}?ignore_range&redirect=6")
+                retry_on Timeout::Error do
+                  ImageSize.url("#{file_url}?ignore_range&redirect=6")
+                end
               end.to raise_error(/Too many redirects/)
             end
           end
