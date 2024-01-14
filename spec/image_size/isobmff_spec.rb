@@ -53,8 +53,8 @@ describe ImageSize::ISOBMFF do
 
       it do
         is_expected.to yield_successive_args(
-          having_attributes(:type => 'abcd', :data_offset => 8, :data_size => 42),
-          having_attributes(:type => 'efgh', :data_offset => 58, :data_size => 10)
+          having_attributes(type: 'abcd', data_offset: 8, data_size: 42),
+          having_attributes(type: 'efgh', data_offset: 58, data_size: 10)
         )
       end
     end
@@ -74,14 +74,14 @@ describe ImageSize::ISOBMFF do
     describe 'for a box without content' do
       let(:data){ boxes.build{ box('test', 8) } }
 
-      it{ is_expected.to yield_successive_args(having_attributes(:type => 'test', :data_offset => 8, :data_size => 0)) }
+      it{ is_expected.to yield_successive_args(having_attributes(type: 'test', data_offset: 8, data_size: 0)) }
     end
 
     describe 'for a box with content' do
       let(:data){ boxes.build{ box('test', 8 + 42) } }
 
       it do
-        is_expected.to yield_successive_args(having_attributes(:type => 'test', :data_offset => 8, :data_size => 42))
+        is_expected.to yield_successive_args(having_attributes(type: 'test', data_offset: 8, data_size: 42))
       end
     end
 
@@ -100,7 +100,7 @@ describe ImageSize::ISOBMFF do
       let(:data){ boxes.build{ box('test', 0) } }
 
       it do
-        is_expected.to yield_successive_args(having_attributes(:type => 'test', :data_offset => 8, :data_size => nil))
+        is_expected.to yield_successive_args(having_attributes(type: 'test', data_offset: 8, data_size: nil))
       end
     end
 
@@ -116,7 +116,7 @@ describe ImageSize::ISOBMFF do
       let(:data){ boxes.build{ box('test', 1, 16) } }
 
       it do
-        is_expected.to yield_successive_args(having_attributes(:type => 'test', :data_offset => 16, :data_size => 0))
+        is_expected.to yield_successive_args(having_attributes(type: 'test', data_offset: 16, data_size: 0))
       end
     end
 
@@ -124,12 +124,12 @@ describe ImageSize::ISOBMFF do
       let(:data){ boxes.build{ box('test', 1, 16 + 42) } }
 
       it do
-        is_expected.to yield_successive_args(having_attributes(:type => 'test', :data_offset => 16, :data_size => 42))
+        is_expected.to yield_successive_args(having_attributes(type: 'test', data_offset: 16, data_size: 42))
       end
     end
 
     describe 'for a full box' do
-      let(:options){ { :full => %w[test] } }
+      let(:options){ { full: %w[test] } }
 
       let(:data) do
         boxes.build do
@@ -141,18 +141,18 @@ describe ImageSize::ISOBMFF do
       it do
         is_expected.to yield_successive_args(
           having_attributes(
-            :type => 'test',
-            :data_offset => 12,
-            :data_size => 38,
-            :version => 0x61,
-            :flags => 0x626364
+            type: 'test',
+            data_offset: 12,
+            data_size: 38,
+            version: 0x61,
+            flags: 0x626364
           )
         )
       end
     end
 
     describe 'for a big full box' do
-      let(:options){ { :full => %w[test] } }
+      let(:options){ { full: %w[test] } }
 
       let(:data) do
         boxes.build do
@@ -164,11 +164,11 @@ describe ImageSize::ISOBMFF do
       it do
         is_expected.to yield_successive_args(
           having_attributes(
-            :type => 'test',
-            :data_offset => 20,
-            :data_size => 38,
-            :version => 0x61,
-            :flags => 0x626364
+            type: 'test',
+            data_offset: 20,
+            data_size: 38,
+            version: 0x61,
+            flags: 0x626364
           )
         )
       end
@@ -206,8 +206,8 @@ describe ImageSize::ISOBMFF do
 
         it do
           is_expected.to yield_successive_args(
-            having_attributes(:type => 'fooo', :data_offset => 16, :data_size => 0),
-            having_attributes(:type => 'barr', :data_offset => 24, :data_size => 0)
+            having_attributes(type: 'fooo', data_offset: 16, data_size: 0),
+            having_attributes(type: 'barr', data_offset: 24, data_size: 0)
           )
         end
       end
@@ -230,7 +230,7 @@ describe ImageSize::ISOBMFF do
         let(:length){ 8 }
 
         it do
-          is_expected.to yield_successive_args(having_attributes(:type => 'fooo', :data_offset => 16, :data_size => 0))
+          is_expected.to yield_successive_args(having_attributes(type: 'fooo', data_offset: 16, data_size: 0))
         end
       end
     end
@@ -256,24 +256,24 @@ describe ImageSize::ISOBMFF do
     end
 
     context 'when configured to recures all' do
-      let(:options){ { :recurse => %w[fooA barA barB bazA] } }
+      let(:options){ { recurse: %w[fooA barA barB bazA] } }
 
       it 'recurses complete tree' do
         enum = instance.to_enum(:recurse, string_reader)
 
-        expect(enum.next).to have_attributes(:type => 'fooA', :data_offset => 8, :data_size => 10)
+        expect(enum.next).to have_attributes(type: 'fooA', data_offset: 8, data_size: 10)
 
-        expect(enum.next).to have_attributes(:type => 'fooB', :data_offset => 16, :data_size => 2)
+        expect(enum.next).to have_attributes(type: 'fooB', data_offset: 16, data_size: 2)
 
-        expect(enum.next).to have_attributes(:type => 'barA', :data_offset => 26, :data_size => 18)
+        expect(enum.next).to have_attributes(type: 'barA', data_offset: 26, data_size: 18)
 
-        expect(enum.next).to have_attributes(:type => 'barB', :data_offset => 34, :data_size => 10)
+        expect(enum.next).to have_attributes(type: 'barB', data_offset: 34, data_size: 10)
 
-        expect(enum.next).to have_attributes(:type => 'barC', :data_offset => 42, :data_size => 2)
+        expect(enum.next).to have_attributes(type: 'barC', data_offset: 42, data_size: 2)
 
-        expect(enum.next).to have_attributes(:type => 'bazA', :data_offset => 52, :data_size => 10)
+        expect(enum.next).to have_attributes(type: 'bazA', data_offset: 52, data_size: 10)
 
-        expect(enum.next).to have_attributes(:type => 'bazB', :data_offset => 60, :data_size => 2)
+        expect(enum.next).to have_attributes(type: 'bazB', data_offset: 60, data_size: 2)
 
         expect{ enum.next }.to raise_exception(StopIteration)
       end
@@ -284,18 +284,18 @@ describe ImageSize::ISOBMFF do
     end
 
     context 'when configured to recurse part' do
-      let(:options){ { :recurse => %w[barA] } }
+      let(:options){ { recurse: %w[barA] } }
 
       it 'recurses requested part' do
         enum = instance.to_enum(:recurse, string_reader)
 
-        expect(enum.next).to have_attributes(:type => 'fooA', :data_offset => 8, :data_size => 10)
+        expect(enum.next).to have_attributes(type: 'fooA', data_offset: 8, data_size: 10)
 
-        expect(enum.next).to have_attributes(:type => 'barA', :data_offset => 26, :data_size => 18)
+        expect(enum.next).to have_attributes(type: 'barA', data_offset: 26, data_size: 18)
 
-        expect(enum.next).to have_attributes(:type => 'barB', :data_offset => 34, :data_size => 10)
+        expect(enum.next).to have_attributes(type: 'barB', data_offset: 34, data_size: 10)
 
-        expect(enum.next).to have_attributes(:type => 'bazA', :data_offset => 52, :data_size => 10)
+        expect(enum.next).to have_attributes(type: 'bazA', data_offset: 52, data_size: 10)
 
         expect{ enum.next }.to raise_exception(StopIteration)
       end
@@ -311,11 +311,11 @@ describe ImageSize::ISOBMFF do
       it 'does not recurse' do
         enum = instance.to_enum(:recurse, string_reader)
 
-        expect(enum.next).to have_attributes(:type => 'fooA', :data_offset => 8, :data_size => 10)
+        expect(enum.next).to have_attributes(type: 'fooA', data_offset: 8, data_size: 10)
 
-        expect(enum.next).to have_attributes(:type => 'barA', :data_offset => 26, :data_size => 18)
+        expect(enum.next).to have_attributes(type: 'barA', data_offset: 26, data_size: 18)
 
-        expect(enum.next).to have_attributes(:type => 'bazA', :data_offset => 52, :data_size => 10)
+        expect(enum.next).to have_attributes(type: 'bazA', data_offset: 52, data_size: 10)
 
         expect{ enum.next }.to raise_exception(StopIteration)
       end
@@ -326,20 +326,20 @@ describe ImageSize::ISOBMFF do
     end
 
     context 'when configured to stop' do
-      let(:options){ { :recurse => %w[fooA barA barB bazA], :last => %w[barA] } }
+      let(:options){ { recurse: %w[fooA barA barB bazA], last: %w[barA] } }
 
       it 'recurses complete tree' do
         enum = instance.to_enum(:recurse, string_reader)
 
-        expect(enum.next).to have_attributes(:type => 'fooA', :data_offset => 8, :data_size => 10)
+        expect(enum.next).to have_attributes(type: 'fooA', data_offset: 8, data_size: 10)
 
-        expect(enum.next).to have_attributes(:type => 'fooB', :data_offset => 16, :data_size => 2)
+        expect(enum.next).to have_attributes(type: 'fooB', data_offset: 16, data_size: 2)
 
-        expect(enum.next).to have_attributes(:type => 'barA', :data_offset => 26, :data_size => 18)
+        expect(enum.next).to have_attributes(type: 'barA', data_offset: 26, data_size: 18)
 
-        expect(enum.next).to have_attributes(:type => 'barB', :data_offset => 34, :data_size => 10)
+        expect(enum.next).to have_attributes(type: 'barB', data_offset: 34, data_size: 10)
 
-        expect(enum.next).to have_attributes(:type => 'barC', :data_offset => 42, :data_size => 2)
+        expect(enum.next).to have_attributes(type: 'barC', data_offset: 42, data_size: 2)
 
         expect{ enum.next }.to raise_exception(StopIteration)
       end

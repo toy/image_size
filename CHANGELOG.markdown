@@ -2,6 +2,8 @@
 
 ## unreleased
 
+* Require ruby 1.9.3 [@toy](https://github.com/toy)
+
 ## v3.3.0 (2023-05-30)
 
 * Support `HEIF` (`HEIC` and `AVIF`) images [#19](https://github.com/toy/image_size/issues/19) [@toy](https://github.com/toy)

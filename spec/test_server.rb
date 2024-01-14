@@ -8,12 +8,12 @@ class TestServer
 
   def initialize(host = '127.0.0.1')
     server_options = {
-      :Logger => WEBrick::Log.new(StringIO.new),
-      :AccessLog => [],
-      :BindAddress => host,
-      :Port => 0, # get the next available port
-      :DocumentRoot => '.',
-      :RequestCallback => proc do |req, res|
+      Logger: WEBrick::Log.new(StringIO.new),
+      AccessLog: [],
+      BindAddress: host,
+      Port: 0, # get the next available port
+      DocumentRoot: '.',
+      RequestCallback: proc do |req, res|
         redirect = req.query['redirect'].to_i
         if redirect > 0
           res.set_redirect(

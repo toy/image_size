@@ -35,7 +35,6 @@ jobs:
     strategy:
       matrix:
         container:
-        - rspec/ci:1.8.7
         - rspec/ci:1.9.3
         - ruby:2.0
         - ruby:2.1

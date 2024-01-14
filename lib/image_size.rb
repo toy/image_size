@@ -339,8 +339,8 @@ private
   end
 
   JP2_WALKER = ImageSize::ISOBMFF.new(
-    :recurse => %w[jp2h],
-    :last => %w[jp2h]
+    recurse: %w[jp2h],
+    last: %w[jp2h]
   )
   def size_of_jp2(ir)
     JP2_WALKER.recurse(ir) do |box|
@@ -370,9 +370,9 @@ private
   end
 
   HEIF_WALKER = ImageSize::ISOBMFF.new(
-    :recurse => %w[meta iprp ipco],
-    :full => %w[meta hdlr pitm ipma ispe],
-    :last => %w[meta]
+    recurse: %w[meta iprp ipco],
+    full: %w[meta hdlr pitm ipma ispe],
+    last: %w[meta]
   )
   def size_of_heif(ir)
     pitm = nil

@@ -62,11 +62,11 @@ class ImageSize
         end
 
         attributes = {
-          :type => type,
-          :offset => offset,
-          :size => size,
-          :relative_data_offset => relative_data_offset,
-          :index => index,
+          type: type,
+          offset: offset,
+          size: size,
+          relative_data_offset: relative_data_offset,
+          index: index,
         }
 
         if @full.include?(type)

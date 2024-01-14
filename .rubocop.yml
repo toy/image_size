@@ -59,9 +59,6 @@ Style/FileRead:
 Style/HashEachMethods:
   Enabled: true
 
-Style/HashSyntax:
-  EnforcedStyle: hash_rockets
-
 Style/HashTransformKeys:
   Enabled: false
 

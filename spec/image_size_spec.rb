@@ -66,12 +66,12 @@ describe ImageSize do
         width, height, format = match[1].to_i, match[2].to_i, match[3].to_sym if match
         size = format && [width, height]
         {
-          :format => format,
-          :width => width,
-          :height => height,
-          :w => width,
-          :h => height,
-          :size => size,
+          format: format,
+          width: width,
+          height: height,
+          w: width,
+          h: height,
+          size: size,
         }
       end
       let(:file_data){ File.open(path, 'rb', &:read) }
@@ -232,8 +232,8 @@ describe ImageSize do
   end
 
   {
-    :png => "\211PNG\r\n\032\n",
-    :jpeg => "\377\330",
+    png: "\211PNG\r\n\032\n",
+    jpeg: "\377\330",
   }.each do |type, data|
     it "raises FormatError if invalid #{type} given" do
       expect do
