@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'image_size'
 require 'image_size/reader'
 require 'image_size/chunky_reader'
 
