@@ -68,6 +68,8 @@ describe ImageSize do
           format = match[3].to_sym
         end
         size = format && [width, height]
+        media_types = ImageSize::MEDIA_TYPES[format] || []
+        media_type = format && media_types.first.to_s
         {
           format: format,
           width: width,
@@ -75,6 +77,8 @@ describe ImageSize do
           w: width,
           h: height,
           size: size,
+          media_type: media_type,
+          media_types: media_types,
         }
       end
       let(:file_data){ File.binread(path) }

@@ -26,7 +26,7 @@ gem 'image_size', '~> 3.0'
 ```ruby
 image_size = ImageSize.path('spec/images/jpeg/436x429.jpeg')
 
-image_size.format       #=> :jpec
+image_size.format       #=> :jpeg
 image_size.width        #=> 436
 image_size.height       #=> 429
 image_size.w            #=> 436
@@ -38,6 +38,8 @@ image_size.size.width   #=> 436
 image_size.size.height  #=> 429
 image_size.size.w       #=> 436
 image_size.size.h       #=> 429
+image_size.media_type   #=> "image/jpeg"
+image_size.media_types  #=> ["image/jpeg"]
 ```
 
 Or using `IO` object:

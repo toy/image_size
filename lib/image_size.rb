@@ -3,6 +3,7 @@
 
 require 'image_size/isobmff'
 require 'image_size/format_error'
+require 'image_size/media_types'
 require 'image_size/reader'
 require 'image_size/seekable_io_reader'
 require 'image_size/stream_io_reader'
@@ -67,6 +68,19 @@ class ImageSize
   # get image width and height as an array which to_s method returns "#{width}x#{height}"
   def size
     Size.new([width, height]) if format
+  end
+
+  # Media type (formerly known as a MIME type)
+  def media_type
+    MEDIA_TYPES.fetch(format, []).first
+  end
+
+  # All media types:
+  # * commonly used and official like for apng and ico
+  # * main and compatible like for heic and pnm (pbm, pgm, ppm)
+  # * multiple unregistered like for mng
+  def media_types
+    MEDIA_TYPES.fetch(format, [])
   end
 
 private
