@@ -96,8 +96,7 @@ If server recognises Range header, only needed chunks will be fetched even for T
 of data will be fetched, in most cases first few kilobytes (TIFF images is an exception).
 
 ```ruby
-require 'image_size'
-require 'image_size/uri_reader'
+require 'image_size/uri'
 
 url = 'http://upload.wikimedia.org/wikipedia/commons/b/b4/Mardin_1350660_1350692_33_images.jpg'
 p ImageSize.url(url).size

@@ -2,6 +2,7 @@
 
 ## unreleased
 
+* Allow fetching from HTTP server by requiring image_size/uri [@toy](https://github.com/toy)
 * Fix for ArgumentError when requiring only image_size/uri_reader (without image_size) [@toy](https://github.com/toy)
 * Require ruby 1.9.3 [@toy](https://github.com/toy)
 
