@@ -15,18 +15,12 @@ Layout/CaseIndentation:
 Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
 
-Layout/FirstHashElementIndentation:
-  EnforcedStyle: consistent
-
 Layout/LineLength:
   Max: 120
 
 Layout/SpaceBeforeBlockBraces:
   EnforcedStyle: no_space
   EnforcedStyleForEmptyBraces: no_space
-
-Lint/PercentStringArray: # broken in rubocop 0.55.0
-  Enabled: false
 
 Metrics/BlockLength:
   Exclude:
@@ -41,37 +35,16 @@ Metrics/MethodLength:
 Naming/MethodParameterName:
   Enabled: false
 
-Style/AccessorGrouping:
-  Enabled: false
-
 Style/Alias:
   EnforcedStyle: prefer_alias_method
+
+Style/ArgumentsForwarding:
+  Enabled: false
 
 Style/EmptyCaseCondition:
   Enabled: false
 
-Style/Encoding:
-  Enabled: false
-
-Style/FileRead:
-  Enabled: false
-
-Style/HashEachMethods:
-  Enabled: true
-
-Style/HashTransformKeys:
-  Enabled: false
-
-Style/HashTransformValues:
-  Enabled: false
-
-Style/IfUnlessModifier:
-  Enabled: false
-
 Style/NumericPredicate:
-  Enabled: false
-
-Style/ParallelAssignment:
   Enabled: false
 
 Style/SafeNavigation:

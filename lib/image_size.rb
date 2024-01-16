@@ -139,17 +139,13 @@ private
   end
 
   def size_of_mng(ir)
-    unless ir[12, 4] == 'MHDR'
-      raise FormatError, 'MHDR not in place for MNG'
-    end
+    raise FormatError, 'MHDR not in place for MNG' unless ir[12, 4] == 'MHDR'
 
     ir.unpack(16, 8, 'NN')
   end
 
   def size_of_png(ir)
-    unless ir[12, 4] == 'IHDR'
-      raise FormatError, 'IHDR not in place for PNG'
-    end
+    raise FormatError, 'IHDR not in place for PNG' unless ir[12, 4] == 'IHDR'
 
     ir.unpack(16, 8, 'NN')
   end
@@ -167,14 +163,12 @@ private
     loop do
       offset += 1 until [nil, section_marker].include? ir[offset, 1]
       offset += 1 until section_marker != ir[offset + 1, 1]
-      raise FormatError, 'EOF in JPEG' if ir[offset, 1].nil?
+      raise FormatError, 'EOF in JPEG' unless ir[offset, 1]
 
       code, length = ir.unpack(offset, 4, 'xCn')
       offset += 4
 
-      if JPEG_CODE_CHECK.include?(code)
-        return ir.unpack(offset + 1, 4, 'nn').reverse
-      end
+      return ir.unpack(offset + 1, 4, 'nn').reverse if JPEG_CODE_CHECK.include?(code)
 
       offset += length - 2
     end
@@ -239,9 +233,7 @@ private
   def size_of_xpm(ir)
     length = 1024
     until (data = ir[0, length]) =~ /"\s*(\d+)\s+(\d+)(\s+\d+\s+\d+){1,2}\s*"/m
-      if data.length != length
-        raise FormatError, 'XPM size not found'
-      end
+      raise FormatError, 'XPM size not found' if data.length != length
 
       length += 1024
     end
@@ -270,7 +262,7 @@ private
       tag, type = ifd.unpack(endian2b * 2)
       offset += 12
 
-      next if packspec[type].nil?
+      next unless packspec[type]
 
       value = ifd[8, 4].unpack(packspec[type])[0]
       case tag

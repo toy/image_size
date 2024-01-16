@@ -62,8 +62,11 @@ describe ImageSize do
     describe "for #{path}" do
       let(:name){ File.basename(path) }
       let(:attributes) do
-        match = /(\d+)x(\d+)\.([^.]+)$/.match(name)
-        width, height, format = match[1].to_i, match[2].to_i, match[3].to_sym if match
+        if (match = /(\d+)x(\d+)\.([^.]+)$/.match(name))
+          width = match[1].to_i
+          height = match[2].to_i
+          format = match[3].to_sym
+        end
         size = format && [width, height]
         {
           format: format,
@@ -74,7 +77,7 @@ describe ImageSize do
           size: size,
         }
       end
-      let(:file_data){ File.open(path, 'rb', &:read) }
+      let(:file_data){ File.binread(path) }
       let(:file_size){ file_data.length }
 
       before do

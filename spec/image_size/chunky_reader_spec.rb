@@ -29,7 +29,7 @@ describe ImageSize::ChunkyReader do
     {
       'empty string' => '',
       'a bit of data' => 'foo bar baz',
-      'a lot of data' => File.open('GPL', 'rb', &:read),
+      'a lot of data' => File.binread('GPL'),
     }.each do |data_description, data|
       {
         'default' => test_reader.new(data),
