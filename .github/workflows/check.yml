@@ -41,7 +41,7 @@ jobs:
         - ruby:2.2
       fail-fast: false
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - run: bundle install
     - run: bundle exec rspec --format documentation
   windows:
