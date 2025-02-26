@@ -1,5 +1,5 @@
 [![Gem Version](https://img.shields.io/gem/v/image_size?logo=rubygems)](https://rubygems.org/gems/image_size)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/toy/image_size/check.yml?logo=github)](https://github.com/toy/image_size/actions/workflows/check.yml)
+[![Check](https://img.shields.io/github/actions/workflow/status/toy/image_size/check.yml?label=check&logo=github)](https://github.com/toy/image_size/actions/workflows/check.yml)
 [![Rubocop](https://img.shields.io/github/actions/workflow/status/toy/image_size/rubocop.yml?label=rubocop&logo=rubocop)](https://github.com/toy/image_size/actions/workflows/rubocop.yml)
 
 # image_size
