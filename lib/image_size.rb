@@ -436,4 +436,6 @@ private
   end
   alias_method :size_of_avif, :size_of_heif
   alias_method :size_of_heic, :size_of_heif
+
+  private_constant :SVG_R, :XML_R, :JPEG_CODE_CHECK, :JP2_WALKER, :EMF_UMAX, :EMF_SMAX, :HEIF_WALKER
 end

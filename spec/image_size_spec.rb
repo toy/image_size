@@ -67,7 +67,7 @@ describe ImageSize do
           height = match[2].to_i
           format = match[3].to_sym
         end
-        size = format && [width, height]
+        size = [width, height] if format
         media_types = ImageSize::MEDIA_TYPES[format] || []
         media_type = format && media_types.first.to_s
         {
