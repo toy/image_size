@@ -51,6 +51,7 @@ class ImageSize
     Reader.open(data) do |ir|
       @format = detect_format(ir)
       @width, @height = send("size_of_#{@format}", ir) if @format
+      @byte_size = ir.byte_size
     end
   end
 
@@ -64,6 +65,8 @@ class ImageSize
   # Image height
   attr_reader :height
   alias_method :h, :height
+
+  attr_reader :byte_size
 
   # get image width and height as an array which to_s method returns "#{width}x#{height}"
   def size

@@ -12,6 +12,10 @@ class ImageSize
       @chunks = {}
     end
 
+    def byte_size
+      @io.size
+    end
+
   private
 
     def chunk(i)

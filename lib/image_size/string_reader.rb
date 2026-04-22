@@ -17,5 +17,9 @@ class ImageSize
     def [](offset, length)
       @string[offset, length]
     end
+
+    def byte_size
+      @string.bytesize
+    end
   end
 end

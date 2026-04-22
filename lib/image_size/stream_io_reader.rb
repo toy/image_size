@@ -11,6 +11,12 @@ class ImageSize
       @chunks = []
     end
 
+    def byte_size
+      return nil unless @io.respond_to?(:stat) && @io.stat.file?
+
+      @io.stat.size
+    end
+
   private
 
     def chunk(i)
