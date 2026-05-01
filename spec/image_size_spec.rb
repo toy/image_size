@@ -310,4 +310,45 @@ describe ImageSize do
       is_expected.to eql(72.0)
     end
   end
+
+  describe '.chunk_size' do
+    subject{ ImageSize.chunk_size }
+
+    after{ ImageSize.chunk_size = nil }
+
+    it 'is 4096 by default' do
+      is_expected.to eql(4096)
+    end
+
+    it 'is can be set to an Integer' do
+      ImageSize.chunk_size = 256
+
+      is_expected.to eql(256)
+    end
+
+    it 'is can not be set to 0' do
+      expect{ ImageSize.chunk_size = 0 }.to raise_error(ArgumentError)
+
+      is_expected.to eql(4096)
+    end
+
+    it 'is can not be set to a negative value' do
+      expect{ ImageSize.chunk_size = -1 }.to raise_error(ArgumentError)
+
+      is_expected.to eql(4096)
+    end
+
+    it 'is can not be set to a Float' do
+      expect{ ImageSize.chunk_size = 3.5 }.to raise_error(ArgumentError)
+
+      is_expected.to eql(4096)
+    end
+
+    it 'can be reset' do
+      ImageSize.chunk_size = 256
+      ImageSize.chunk_size = nil
+
+      is_expected.to eql(4096)
+    end
+  end
 end

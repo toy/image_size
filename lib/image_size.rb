@@ -48,6 +48,20 @@ class ImageSize
     @dpi = dpi ? dpi.to_f : nil
   end
 
+  # Size of chunk to use by IO and URI readers
+  def self.chunk_size
+    @chunk_size || 4096
+  end
+
+  # Set size of chunk to use by IO and URI readers
+  def self.chunk_size=(chunk_size)
+    unless chunk_size.nil? || (chunk_size.is_a?(Integer) && chunk_size > 0)
+      fail ArgumentError, "chunk_size should be a positive Integer or nil, got #{chunk_size}"
+    end
+
+    @chunk_size = chunk_size
+  end
+
   # Given image as any class responding to read and eof? or data as String, finds its format and dimensions
   def initialize(data)
     Reader.open(data) do |ir|

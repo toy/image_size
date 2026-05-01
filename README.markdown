@@ -100,6 +100,12 @@ DPI used for converting `svg` and `emf` dimensions can be configured from defaul
 ImageSize.dpi = 150
 ```
 
+Chunk size used for reading files, IO and from remote can be configured from default 4096:
+
+```ruby
+ImageSize.chunk_size = 256
+```
+
 ### Experimental: fetch image meta from HTTP server
 
 If server recognises Range header, only needed chunks will be fetched even for TIFF images, otherwise required amount

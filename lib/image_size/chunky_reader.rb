@@ -8,7 +8,7 @@ class ImageSize
 
     # Size of a chunk in which to read
     def chunk_size
-      4096
+      @chunk_size ||= ImageSize.chunk_size
     end
 
     # Including class should define method chunk that accepts the chunk number
