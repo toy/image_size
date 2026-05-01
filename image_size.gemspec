@@ -18,9 +18,18 @@ Gem::Specification.new do |s|
     'source_code_uri'   => "https://github.com/toy/#{s.name}",
   } if s.respond_to?(:metadata=)
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files = Dir[*%w[
+    .gitignore
+    .rubocop*.yml
+    Gemfile
+    LICENSE.txt
+    GPL
+    *.markdown
+    *.gemspec
+    {.github,lib,spec}/**/{*,.gitattributes}
+  ]].reject(&File.method(:directory?))
+
+  s.test_files = Dir['spec/**/{*,.gitattributes}'].reject(&File.method(:directory?))
   s.require_paths = %w[lib]
 
   s.add_development_dependency 'rspec', '~> 3.0'
