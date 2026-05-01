@@ -2,7 +2,7 @@
 
 ## unreleased
 
-* Add `byte_size` method to expose the size of the image data in bytes [@dgodd](https://github.com/dgodd)
+* Add `byte_size` method to expose the size of the image data in bytes [#27](https://github.com/toy/image_size/pull/27) [@dgodd](https://github.com/dgodd)
 
 ## v3.4.0 (2024-01-16)
 

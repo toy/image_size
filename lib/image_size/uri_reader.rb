@@ -98,7 +98,7 @@ class ImageSize
           when Net::HTTPRedirection
             uri += response['location']
           when Net::HTTPPartialContent
-            m = response['content-range'].match(%r{bytes\s+\d+-\d+/(\d+)}) if response['content-range']
+            m = response['content-range'].match(%r{\bbytes\s+\d+-\d+/(\d+)}i) if response['content-range']
             byte_size = m[1].to_i if m
             return yield RangeReader.new(http, uri.request_uri, response.body, byte_size)
           when Net::HTTPRequestedRangeNotSatisfiable
