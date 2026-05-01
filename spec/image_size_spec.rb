@@ -79,6 +79,7 @@ describe ImageSize do
           size: size,
           media_type: media_type,
           media_types: media_types,
+          byte_size: file_size,
         }
       end
       let(:file_data){ File.binread(path) }
@@ -119,6 +120,8 @@ describe ImageSize do
       end
 
       context 'given as unseekable IO' do
+        let(:attributes){ super().merge(byte_size: nil) }
+
         it 'gets format and dimensions' do
           IO.popen(%W[cat #{path}].shelljoin, 'rb') do |io|
             image_size = ImageSize.new(io)

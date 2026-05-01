@@ -2,6 +2,8 @@
 
 ## unreleased
 
+* Add `byte_size` method to expose the size of the image data in bytes [#27](https://github.com/toy/image_size/pull/27) [@dgodd](https://github.com/dgodd)
+
 ## v3.4.0 (2024-01-16)
 
 * Provide access to media types using media_type and media_types methods [#22](https://github.com/toy/image_size/issues/22) [@toy](https://github.com/toy)

@@ -25,9 +25,12 @@ class ImageSize
     class BodyReader # :nodoc:
       include ChunkyReader
 
+      attr_reader :byte_size
+
       def initialize(response)
         @body = String.new
         @body_reader = response.to_enum(:read_body)
+        @byte_size = response.content_length
       end
 
       def [](offset, length)
@@ -46,10 +49,13 @@ class ImageSize
     class RangeReader # :nodoc:
       include HTTPChunkyReader
 
-      def initialize(http, request_uri, chunk0)
+      attr_reader :byte_size
+
+      def initialize(http, request_uri, chunk0, byte_size)
         @http = http
         @request_uri = request_uri
         @chunks = { 0 => chunk0 }
+        @byte_size = byte_size
       end
 
       def chunk(i)
@@ -92,7 +98,9 @@ class ImageSize
           when Net::HTTPRedirection
             uri += response['location']
           when Net::HTTPPartialContent
-            return yield RangeReader.new(http, uri.request_uri, response.body)
+            m = response['content-range'].match(%r{\bbytes\s+\d+-\d+/(\d+)}i) if response['content-range']
+            byte_size = m[1].to_i if m
+            return yield RangeReader.new(http, uri.request_uri, response.body, byte_size)
           when Net::HTTPRequestedRangeNotSatisfiable
             return yield StringReader.new('')
           else
