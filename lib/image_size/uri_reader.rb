@@ -110,7 +110,7 @@ class ImageSize
 
         raise "Too many redirects: #{uri}"
       ensure
-        http.finish if http.started?
+        http.finish if http && http.started?
       end
     end
   end
