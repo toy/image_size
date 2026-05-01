@@ -92,6 +92,14 @@ File.open('spec/images/jpeg/436x429.jpeg', 'rb') do |fh|
 end
 ```
 
+### Configuration
+
+DPI used for converting `svg` and `emf` dimensions can be configured from default 72:
+
+```ruby
+ImageSize.dpi = 150
+```
+
 ### Experimental: fetch image meta from HTTP server
 
 If server recognises Range header, only needed chunks will be fetched even for TIFF images, otherwise required amount

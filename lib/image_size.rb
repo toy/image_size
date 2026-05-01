@@ -36,14 +36,16 @@ class ImageSize
     new(Pathname.new(path))
   end
 
-  # Used for svg
+  # Used for svg and emf
   def self.dpi
-    @dpi || 72
+    @dpi || 72.0
   end
 
-  # Used for svg
+  # Used for svg and emf
   def self.dpi=(dpi)
-    @dpi = dpi.to_f
+    fail ArgumentError, "dpi should be nil or positive, got #{dpi}" unless dpi.nil? || dpi > 0
+
+    @dpi = dpi ? dpi.to_f : nil
   end
 
   # Given image as any class responding to read and eof? or data as String, finds its format and dimensions

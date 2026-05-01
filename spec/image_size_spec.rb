@@ -275,4 +275,39 @@ describe ImageSize do
       end.to raise_error(ImageSize::FormatError)
     end
   end
+
+  describe '.dpi' do
+    subject{ ImageSize.dpi }
+
+    after{ ImageSize.dpi = nil }
+
+    it 'is 72 by default' do
+      is_expected.to eql(72.0)
+    end
+
+    it 'is can be set and get converted to Float' do
+      ImageSize.dpi = 42
+
+      is_expected.to eql(42.0)
+    end
+
+    it 'is can not be set to 0' do
+      expect{ ImageSize.dpi = 0 }.to raise_error(ArgumentError)
+
+      is_expected.to eql(72.0)
+    end
+
+    it 'is can not be set to a negative value' do
+      expect{ ImageSize.dpi = -42 }.to raise_error(ArgumentError)
+
+      is_expected.to eql(72.0)
+    end
+
+    it 'can be reset' do
+      ImageSize.dpi = 42
+      ImageSize.dpi = nil
+
+      is_expected.to eql(72.0)
+    end
+  end
 end
