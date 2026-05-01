@@ -76,9 +76,9 @@ class ImageSize
     class << self
       include HTTPChunkyReader
 
-      def open(uri, max_redirects = 5)
+      def open(uri)
         http = nil
-        (max_redirects + 1).times do
+        (ImageSize.max_redirects + 1).times do
           unless http && http.address == uri.host && http.port == uri.port
             http.finish if http
 
@@ -131,5 +131,19 @@ class ImageSize
 
   def self.url(url)
     new(url.is_a?(URI) ? url : URI(url))
+  end
+
+  # Maximum number of redirects
+  def self.max_redirects
+    @max_redirects || 5
+  end
+
+  # Set maximum number of redirects
+  def self.max_redirects=(max_redirects)
+    unless max_redirects.nil? || (max_redirects.is_a?(Integer) && max_redirects >= 0)
+      fail ArgumentError, "max_redirects should be 0, a positive Integer or nil, got #{max_redirects}"
+    end
+
+    @max_redirects = max_redirects
   end
 end

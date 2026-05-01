@@ -154,6 +154,20 @@ puts Benchmark.measure{ p ImageSize.url(url).size }
   0.006247   0.001045   0.007292 (  0.197631)
 ```
 
+#### Configuration
+
+Maximum number of redirects can be configured from default 5:
+
+```ruby
+ImageSize.max_redirects = 10
+```
+
+Or redirects can be disabled:
+
+```ruby
+ImageSize.max_redirects = 0
+```
+
 ## Licence
 
 This code is free to use under the terms of the [Ruby's licence](LICENSE.txt).

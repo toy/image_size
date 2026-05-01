@@ -351,4 +351,45 @@ describe ImageSize do
       is_expected.to eql(4096)
     end
   end
+
+  describe '.max_redirects' do
+    subject{ ImageSize.max_redirects }
+
+    after{ ImageSize.max_redirects = nil }
+
+    it 'is 4096 by default' do
+      is_expected.to eql(5)
+    end
+
+    it 'is can be set to an Integer' do
+      ImageSize.max_redirects = 3
+
+      is_expected.to eql(3)
+    end
+
+    it 'is can be set to 0' do
+      ImageSize.max_redirects = 0
+
+      is_expected.to eql(0)
+    end
+
+    it 'is can not be set to a negative value' do
+      expect{ ImageSize.max_redirects = -1 }.to raise_error(ArgumentError)
+
+      is_expected.to eql(5)
+    end
+
+    it 'is can not be set to a Float' do
+      expect{ ImageSize.max_redirects = 3.5 }.to raise_error(ArgumentError)
+
+      is_expected.to eql(5)
+    end
+
+    it 'can be reset' do
+      ImageSize.max_redirects = 3
+      ImageSize.max_redirects = nil
+
+      is_expected.to eql(5)
+    end
+  end
 end

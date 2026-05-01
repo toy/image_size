@@ -5,6 +5,7 @@
 * Add `byte_size` method to expose the size of the image data in bytes [#27](https://github.com/toy/image_size/pull/27) [@dgodd](https://github.com/dgodd)
 * Add minimal validation of `dpi` global configuration [@toy](https://github.com/toy)
 * Make `chunk_size` globally configurable [@toy](https://github.com/toy)
+* Make `max_redirects` globally configurable [@toy](https://github.com/toy)
 
 ## v3.4.0 (2024-01-16)
 
