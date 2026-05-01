@@ -75,7 +75,7 @@ class ImageSize
 
   # Media type (formerly known as a MIME type)
   def media_type
-    MEDIA_TYPES.fetch(format, []).first
+    media_types.first
   end
 
   # All media types:
