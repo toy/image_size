@@ -30,7 +30,8 @@ class ImageSize
         when input.is_a?(Pathname)
           input.open('rb'){ |f| yield for_io(f) }
         else
-          raise ArgumentError, "expected data as String or an object responding to read and eof?, got #{input.class}"
+          raise ArgumentError, 'expected a String, a Pathname, a StringIO or an object responding to read and eof? ' \
+                               "(IO), got #{input.class}"
         end
       end
 
