@@ -38,7 +38,7 @@ class ImageSize
     private
 
       def for_io(io)
-        if io.respond_to?(:stat) && !io.stat.file?
+        if (io.respond_to?(:stat) && !io.stat.file?) || !io.respond_to?(:seek)
           StreamIOReader.new(io)
         else
           begin

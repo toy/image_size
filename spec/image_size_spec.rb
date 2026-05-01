@@ -14,6 +14,20 @@ RSpec.configure do |config|
   config.order = :random
 end
 
+class RestrictedIO
+  def initialize(data)
+    @io = StringIO.new(data)
+  end
+
+  def read(length = nil)
+    @io.read(length)
+  end
+
+  def eof?
+    @io.eof?
+  end
+end
+
 describe ImageSize do
   before :all do
     @server = TestServer.new
@@ -128,6 +142,16 @@ describe ImageSize do
             expect(image_size).to have_attributes(attributes)
             expect(io).not_to be_closed
           end
+        end
+      end
+
+      context 'given an object allowing only read and eof?' do
+        let(:attributes){ super().merge(byte_size: nil) }
+
+        it 'gets format and dimensions' do
+          io = RestrictedIO.new(file_data)
+          image_size = ImageSize.new(io)
+          expect(image_size).to have_attributes(attributes)
         end
       end
 
