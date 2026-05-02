@@ -4,15 +4,37 @@ require 'webrick'
 require 'stringio'
 
 class TestServer
+  class FileHandler < WEBrick::HTTPServlet::FileHandler
+    def service(req, res)
+      super
+    rescue WEBrick::HTTPStatus::PartialContent
+      if req.query['unknown_file_size']
+        m = %r{\Abytes (\d+)-(\d+)/\d+\z}.match(res['content-range'])
+        raise "Unexpected content-range: #{res['content-range']}" unless m
+
+        res['content-range'] = "bytes #{m[1]}-#{m[2]}/*"
+
+        # need to manually get the chunk, as webrick internally relies on content-range header with total size
+        if res.body.is_a?(IO)
+          offset = m[1].to_i
+          size = m[2].to_i - offset + 1
+
+          res.body.seek(offset, IO::SEEK_SET)
+          res.body = res.body.read(size)
+        end
+      end
+
+      raise
+    end
+  end
+
   attr_reader :base_url
 
   def initialize(host = '127.0.0.1')
     server_options = {
-      Logger: WEBrick::Log.new(StringIO.new),
       AccessLog: [],
       BindAddress: host,
       Port: 0, # get the next available port
-      DocumentRoot: '.',
       RequestCallback: proc do |req, res|
         redirect = req.query['redirect'].to_i
         if redirect > 0
@@ -30,7 +52,11 @@ class TestServer
       end,
     }
 
+    server_options[:Logger] = WEBrick::Log.new(StringIO.new) unless ENV['CI']
+
     @server = WEBrick::HTTPServer.new(server_options)
+    @server.mount('/', FileHandler, '.')
+
     @server.listen(host, 0) # listen on second port
 
     @base_url = URI("http://#{host}:#{@server.listeners[0].addr[1]}/")

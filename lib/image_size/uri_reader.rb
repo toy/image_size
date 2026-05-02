@@ -17,8 +17,12 @@ class ImageSize
     module HTTPChunkyReader # :nodoc:
       include ChunkyReader
 
+      def chunk_start(i)
+        chunk_size * i
+      end
+
       def chunk_range_header(i)
-        { 'Range' => "bytes=#{chunk_size * i}-#{(chunk_size * (i + 1)) - 1}" }
+        { 'Range' => "bytes=#{chunk_start(i)}-#{chunk_start(i + 1) - 1}" }
       end
     end
 
@@ -56,14 +60,23 @@ class ImageSize
         @request_uri = request_uri
         @chunks = { 0 => chunk0 }
         @byte_size = byte_size
+        @last_chunk = nil
       end
 
       def chunk(i)
+        return if @byte_size && chunk_start(i) >= @byte_size
+        return if @last_chunk && i > @last_chunk
+
         unless @chunks.key?(i)
           response = @http.get(@request_uri, chunk_range_header(i))
           case response
           when Net::HTTPPartialContent
-            @chunks[i] = response.body
+            body = response.body
+            @chunks[i] = body
+            @last_chunk = i if body.length < chunk_size
+          when Net::HTTPRequestedRangeNotSatisfiable
+            @chunks[i] = nil
+            @last_chunk = i if !@last_chunk || @last_chunk > i
           else
             raise "Unexpected response: #{response}"
           end
