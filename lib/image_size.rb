@@ -172,13 +172,13 @@ private
   end
 
   def size_of_mng(ir)
-    raise FormatError, 'MHDR not in place for MNG' unless ir[12, 4] == 'MHDR'
+    fail FormatError, 'MHDR not in place for MNG' unless ir[12, 4] == 'MHDR'
 
     ir.unpack(16, 8, 'NN')
   end
 
   def size_of_png(ir)
-    raise FormatError, 'IHDR not in place for PNG' unless ir[12, 4] == 'IHDR'
+    fail FormatError, 'IHDR not in place for PNG' unless ir[12, 4] == 'IHDR'
 
     ir.unpack(16, 8, 'NN')
   end
@@ -196,7 +196,7 @@ private
     loop do
       offset += 1 until [nil, section_marker].include? ir[offset, 1]
       offset += 1 until section_marker != ir[offset + 1, 1]
-      raise FormatError, 'EOF in JPEG' unless ir[offset, 1]
+      fail FormatError, 'EOF in JPEG' unless ir[offset, 1]
 
       code, length = ir.unpack(offset, 4, 'xCn')
       offset += 4
@@ -250,7 +250,7 @@ private
         when /\A(?:DEPTH|MAXVAL) \d+\n/, /\ATUPLTYPE \S+\n/
           # ignore
         else
-          raise FormatError, "Unexpected data in PAM header: #{chunk.inspect}"
+          fail FormatError, "Unexpected data in PAM header: #{chunk.inspect}"
         end
         offset += $&.length
       end
@@ -266,7 +266,7 @@ private
   def size_of_xpm(ir)
     length = 1024
     until (data = ir[0, length]) =~ /"\s*(\d+)\s+(\d+)(\s+\d+\s+\d+){1,2}\s*"/m
-      raise FormatError, 'XPM size not found' if data.length != length
+      fail FormatError, 'XPM size not found' if data.length != length
 
       length += 1024
     end
@@ -290,7 +290,7 @@ private
     width = height = nil
     until width && height
       ifd = ir.fetch(offset, 12)
-      raise FormatError, 'Reached end of directory entries in TIFF' if offset > num_dirent
+      fail FormatError, 'Reached end of directory entries in TIFF' if offset > num_dirent
 
       tag, type = ifd.unpack(endian2b * 2)
       offset += 12
@@ -409,11 +409,11 @@ private
     HEIF_WALKER.recurse(ir) do |box, _path|
       case box.type
       when 'hdlr'
-        raise FormatError, "hdlr box too small (#{box.data_size})" if box.data_size < 8
+        fail FormatError, "hdlr box too small (#{box.data_size})" if box.data_size < 8
 
         return nil unless ir[box.data_offset + 4, 4] == 'pict'
       when 'pitm'
-        raise FormatError, 'second pitm box encountered' if pitm
+        fail FormatError, 'second pitm box encountered' if pitm
 
         pitm = box.version == 0 ? ir.unpack1(box.data_offset, 2, 'n') : ir.unpack1(box.data_offset, 4, 'N')
       when 'ipma'

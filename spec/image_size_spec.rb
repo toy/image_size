@@ -103,7 +103,7 @@ describe ImageSize do
         max_file_size = 16_384
 
         if file_size > max_file_size
-          raise "reduce resulting gem size, #{path} is too big (#{file_size} > #{max_file_size})"
+          fail "reduce resulting gem size, #{path} is too big (#{file_size} > #{max_file_size})"
         end
       end
 

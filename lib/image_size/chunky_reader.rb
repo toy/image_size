@@ -18,7 +18,7 @@ class ImageSize
     # substring, behaves same as str[start, length] except start can't be
     # negative.
     def [](offset, length)
-      raise ArgumentError, "expected offset not to be negative, got #{offset}" if offset < 0
+      fail ArgumentError, "expected offset not to be negative, got #{offset}" if offset < 0
       return if length < 0
 
       first = offset / chunk_size

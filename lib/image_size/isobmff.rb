@@ -56,9 +56,9 @@ class ImageSize
         when 1
           size = reader.unpack1(offset + 8, 8, 'Q>')
           relative_data_offset += 8
-          raise FormatError, "Unexpected ISOBMFF xl-box size #{size}" if size < 16
+          fail FormatError, "Unexpected ISOBMFF xl-box size #{size}" if size < 16
         when 2..7
-          raise FormatError, "Reserved ISOBMFF box size #{size}"
+          fail FormatError, "Reserved ISOBMFF box size #{size}"
         end
 
         attributes = {

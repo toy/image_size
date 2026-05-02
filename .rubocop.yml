@@ -50,6 +50,9 @@ Style/NumericPredicate:
 Style/SafeNavigation:
   Enabled: false
 
+Style/SignalException:
+  EnforcedStyle: semantic
+
 Style/SlicingWithRange:
   Enabled: false
 

@@ -78,7 +78,7 @@ class ImageSize
             @chunks[i] = nil
             @last_chunk = i if !@last_chunk || @last_chunk > i
           else
-            raise "Unexpected response: #{response}"
+            fail "Unexpected response: #{response}"
           end
         end
 
@@ -117,11 +117,11 @@ class ImageSize
           when Net::HTTPRequestedRangeNotSatisfiable
             return yield StringReader.new('')
           else
-            raise "Unexpected response: #{response}"
+            fail "Unexpected response: #{response}"
           end
         end
 
-        raise "Too many redirects: #{uri}"
+        fail "Too many redirects: #{uri}"
       ensure
         http.finish if http && http.started?
       end

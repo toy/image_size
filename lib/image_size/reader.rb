@@ -30,8 +30,8 @@ class ImageSize
         when input.is_a?(Pathname)
           input.open('rb'){ |f| yield for_io(f) }
         else
-          raise ArgumentError, 'expected a String, a Pathname, a StringIO or an object responding to read and eof? ' \
-                               "(IO), got #{input.class}"
+          fail ArgumentError, 'expected a String, a Pathname, a StringIO or an object responding to read and eof? ' \
+                              "(IO), got #{input.class}"
         end
       end
 
@@ -55,7 +55,7 @@ class ImageSize
       chunk = self[offset, length]
 
       unless chunk && chunk.length == length
-        raise FormatError, "Expected #{length} bytes at offset #{offset}, got #{chunk.inspect}"
+        fail FormatError, "Expected #{length} bytes at offset #{offset}, got #{chunk.inspect}"
       end
 
       chunk
