@@ -216,7 +216,7 @@ describe ImageSize do
           end
 
           context 'with too many redirects' do
-            it 'gets format and dimensions' do
+            it 'raises error' do
               expect do
                 retry_on Timeout::Error do
                   ImageSize.url("#{file_url}?redirect=6")
@@ -246,7 +246,7 @@ describe ImageSize do
           end
 
           context 'with too many redirects' do
-            it 'gets format and dimensions' do
+            it 'raises error' do
               expect do
                 retry_on Timeout::Error do
                   ImageSize.url("#{file_url}?ignore_range&redirect=6")
