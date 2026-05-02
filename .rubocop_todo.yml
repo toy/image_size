@@ -20,9 +20,3 @@ Metrics/CyclomaticComplexity:
 # Configuration parameters: IgnoredMethods.
 Metrics/PerceivedComplexity:
   Enabled: false
-
-# Offense count: 8
-# Cop supports --auto-correct.
-Style/PerlBackrefs:
-  Exclude:
-    - 'lib/image_size.rb'

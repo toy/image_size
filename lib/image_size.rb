@@ -225,8 +225,7 @@ private
   def size_of_ppm(ir)
     header = ir[0, 1024]
     header.gsub!(/^\#[^\n\r]*/m, '')
-    header =~ /^(P[1-6])\s+?(\d+)\s+?(\d+)/m
-    [$2.to_i, $3.to_i]
+    header.match(/^(?:P[1-6])\s+?(\d+)\s+?(\d+)/m)[1..2].map(&:to_i)
   end
   alias_method :size_of_pbm, :size_of_ppm
   alias_method :size_of_pgm, :size_of_ppm
@@ -242,9 +241,9 @@ private
         chunk = ir[offset, 32]
         case chunk
         when /\AWIDTH (\d+)\n/
-          width = $1.to_i
+          width = Regexp.last_match[1].to_i
         when /\AHEIGHT (\d+)\n/
-          height = $1.to_i
+          height = Regexp.last_match[1].to_i
         when /\AENDHDR\n/
           break
         when /\A(?:DEPTH|MAXVAL) \d+\n/, /\ATUPLTYPE \S+\n/
@@ -252,25 +251,27 @@ private
         else
           fail FormatError, "Unexpected data in PAM header: #{chunk.inspect}"
         end
-        offset += $&.length
+        offset += Regexp.last_match[0].length
       end
     end
     [width, height]
   end
 
   def size_of_xbm(ir)
-    ir[0, 1024] =~ /^\#define\s*\S*\s*(\d+)\s*\n\#define\s*\S*\s*(\d+)/mi
-    [$1.to_i, $2.to_i]
+    ir[0, 1024].match(/^\#define\s*\S*\s*(\d+)\s*\n\#define\s*\S*\s*(\d+)/mi)[1..2].map(&:to_i)
   end
 
   def size_of_xpm(ir)
     length = 1024
-    until (data = ir[0, length]) =~ /"\s*(\d+)\s+(\d+)(\s+\d+\s+\d+){1,2}\s*"/m
+    loop do
+      data = ir[0, length]
+      m = data.match(/"\s*(\d+)\s+(\d+)(?:\s+\d+\s+\d+){1,2}\s*"/m)
+      return m[1..2].map(&:to_i) if m
+
       fail FormatError, 'XPM size not found' if data.length != length
 
       length += 1024
     end
-    [$1.to_i, $2.to_i]
   end
 
   def size_of_psd(ir)
