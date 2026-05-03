@@ -194,78 +194,74 @@ describe ImageSize do
       end
 
       context 'fetching from webserver' do
-        let(:file_url){ @server.base_url + path }
+        let(:url){ "#{@server.base_url}#{path}#{query}" }
 
         before{ ImageSize.chunk_size = 64 }
         after{ ImageSize.chunk_size = nil }
 
+        subject do
+          retry_on Timeout::Error do
+            ImageSize.url(url)
+          end
+        end
+
         context 'supporting range' do
           context 'without redirects' do
+            let(:query){ '' }
+
             it 'gets format and dimensions' do
-              image_size = retry_on Timeout::Error do
-                ImageSize.url(file_url)
-              end
-              expect(image_size).to have_attributes(attributes)
+              is_expected.to have_attributes(attributes)
             end
           end
 
           context 'with redirects' do
+            let(:query){ '?redirect=5' }
+
             it 'gets format and dimensions' do
-              image_size = retry_on Timeout::Error do
-                ImageSize.url("#{file_url}?redirect=5")
-              end
-              expect(image_size).to have_attributes(attributes)
+              is_expected.to have_attributes(attributes)
             end
           end
 
           context 'with too many redirects' do
+            let(:query){ '?redirect=6' }
+
             it 'raises error' do
-              expect do
-                retry_on Timeout::Error do
-                  ImageSize.url("#{file_url}?redirect=6")
-                end
-              end.to raise_error(/Too many redirects/)
+              expect{ subject }.to raise_error(/Too many redirects/)
             end
           end
 
           context 'with unknown file size' do
+            let(:query){ '?unknown_file_size' }
             let(:attributes){ super().merge(byte_size: file_size.zero? ? 0 : nil) }
 
             it 'gets format and dimensions' do
-              image_size = retry_on Timeout::Error do
-                ImageSize.url("#{file_url}?unknown_file_size")
-              end
-              expect(image_size).to have_attributes(attributes)
+              is_expected.to have_attributes(attributes)
             end
           end
         end
 
         context 'not supporting range' do
+          let(:query){ '?ignore_range' }
+
           context 'without redirects' do
             it 'gets format and dimensions' do
-              image_size = retry_on Timeout::Error do
-                ImageSize.url("#{file_url}?ignore_range")
-              end
-              expect(image_size).to have_attributes(attributes)
+              is_expected.to have_attributes(attributes)
             end
           end
 
           context 'with redirects' do
+            let(:query){ '?ignore_range&redirect=5' }
+
             it 'gets format and dimensions' do
-              image_size = retry_on Timeout::Error do
-                ImageSize.url("#{file_url}?ignore_range&redirect=5")
-              end
-              expect(image_size).to have_attributes(attributes)
+              is_expected.to have_attributes(attributes)
             end
           end
 
           context 'with too many redirects' do
+            let(:query){ '?ignore_range&redirect=6' }
+
             it 'raises error' do
-              expect do
-                retry_on Timeout::Error do
-                  ImageSize.url("#{file_url}?ignore_range&redirect=6")
-                end
-              end.to raise_error(/Too many redirects/)
+              expect{ subject }.to raise_error(/Too many redirects/)
             end
           end
         end
