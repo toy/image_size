@@ -192,4 +192,4 @@ end
 This code is free to use under the terms of the [Ruby's licence](LICENSE.txt).
 
 Original author: Keisuke Minami <keisuke@rccn.com>.\
-Further development 2010-2024 Ivan Kuchin https://github.com/toy/image_size
+Further development 2010-2026 Ivan Kuchin https://github.com/toy/image_size
