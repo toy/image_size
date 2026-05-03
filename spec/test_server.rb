@@ -28,7 +28,7 @@ class TestServer
     end
   end
 
-  attr_reader :base_url
+  attr_reader :base_url, :second_url
 
   def initialize(host = '127.0.0.1')
     server_options = {

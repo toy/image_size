@@ -168,6 +168,24 @@ Or redirects can be disabled:
 ImageSize.max_redirects = 0
 ```
 
+A url checker can be added to reduce SSRF risk:
+
+```ruby
+ImageSize.uri_checker = lambda do |uri|
+  raise 'host is not allowed' unless uri.host == 'upload.wikipedia.org'
+end
+```
+
+Alternatively `private_address_check` gem can be of help:
+
+```ruby
+require "private_address_check/tcpsocket_ext"
+
+PrivateAddressCheck.only_public_connections do
+  ImageSize.url(url).size
+end
+```
+
 ## Licence
 
 This code is free to use under the terms of the [Ruby's licence](LICENSE.txt).

@@ -92,6 +92,8 @@ class ImageSize
       def open(uri)
         http = nil
         (ImageSize.max_redirects + 1).times do
+          ImageSize.uri_checker.call(uri)
+
           unless http && http.address == uri.host && http.port == uri.port
             http.finish if http
 
@@ -158,5 +160,19 @@ class ImageSize
     end
 
     @max_redirects = max_redirects
+  end
+
+  # Hook to call before making every request
+  def self.uri_checker
+    @uri_checker || proc{ |_uri| }
+  end
+
+  # Set hook to call before making every request
+  def self.uri_checker=(uri_checker)
+    unless uri_checker.nil? || uri_checker.respond_to?(:call)
+      fail ArgumentError, "uri_checker should respond to call or be nil, got #{uri_checker}"
+    end
+
+    @uri_checker = uri_checker
   end
 end

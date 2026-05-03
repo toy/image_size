@@ -7,6 +7,7 @@
 * Make `chunk_size` globally configurable [@toy](https://github.com/toy)
 * Make `max_redirects` globally configurable [@toy](https://github.com/toy)
 * Prevent requesting chunks over http after end of file [#29](https://github.com/toy/image_size/issues/29) [@toy](https://github.com/toy)
+* Add ability to restrict fetched URIs by setting `uri_checker` proc [@toy](https://github.com/toy)
 
 ## v3.4.0 (2024-01-16)
 

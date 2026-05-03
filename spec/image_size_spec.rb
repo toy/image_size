@@ -406,4 +406,47 @@ describe ImageSize do
       is_expected.to eql(5)
     end
   end
+
+  describe '.uri_checker' do
+    before{ ImageSize.chunk_size = 64 }
+    after do
+      ImageSize.chunk_size = nil
+      ImageSize.uri_checker = nil
+    end
+
+    it 'can be reset to the default checker' do
+      ImageSize.uri_checker = proc{ |uri| fail 'forbidden' if uri.port == @server.base_url.port }
+      ImageSize.uri_checker = nil
+
+      expect do
+        retry_on Timeout::Error do
+          ImageSize.url("#{@server.base_url}spec/images/empty")
+        end
+      end.not_to raise_error
+    end
+
+    it 'requires an object responding to call' do
+      expect{ ImageSize.uri_checker = Object.new }.to raise_error(ArgumentError)
+    end
+
+    it 'is checked before initial request' do
+      ImageSize.uri_checker = proc{ |uri| fail 'forbidden' if uri.port == @server.base_url.port }
+
+      expect do
+        retry_on Timeout::Error do
+          ImageSize.url("#{@server.base_url}spec/images/empty")
+        end
+      end.to raise_error('forbidden')
+    end
+
+    it 'is checked before redirect request' do
+      ImageSize.uri_checker = proc{ |uri| fail 'forbidden' if uri.port == @server.second_url.port }
+
+      expect do
+        retry_on Timeout::Error do
+          ImageSize.url("#{@server.base_url}spec/images/empty?redirect=1")
+        end
+      end.to raise_error('forbidden')
+    end
+  end
 end
