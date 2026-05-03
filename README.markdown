@@ -40,6 +40,7 @@ image_size.size.w       #=> 436
 image_size.size.h       #=> 429
 image_size.media_type   #=> "image/jpeg"
 image_size.media_types  #=> ["image/jpeg"]
+image_size.byte_size    #=> 10938
 ```
 
 Or using `IO` object:
