@@ -9,6 +9,7 @@ class ImageSize
     emf: %w[image/emf],
     gif: %w[image/gif],
     heic: %w[image/heic image/heif],
+    icns: %w[image/x-icns],
     ico: %w[image/x-icon image/vnd.microsoft.icon],
     j2c: %w[image/j2c],
     jp2: %w[image/jp2],

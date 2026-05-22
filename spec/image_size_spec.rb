@@ -77,11 +77,13 @@ describe ImageSize do
 
     describe "for #{path}" do
       let(:name){ File.basename(path) }
+      let(:match){ name.match(/(?<width>\d+)x(?<height>\d+)(?:@(?<scale>\d)x)?\.(?<format>[^.]+)$/) }
+      let(:scale){ (match[:scale] || 1).to_i if match }
       let(:attributes) do
-        if (match = /(\d+)x(\d+)\.([^.]+)$/.match(name))
-          width = match[1].to_i
-          height = match[2].to_i
-          format = match[3].to_sym
+        if match
+          width = match[:width].to_i * scale
+          height = match[:height].to_i * scale
+          format = match[:format].to_sym
         end
         size = [width, height] if format
         media_types = ImageSize::MEDIA_TYPES[format] || []
@@ -271,7 +273,22 @@ describe ImageSize do
 
   context 'for images' do
     Dir['spec/images/*/*.*'].each do |path|
-      test_image_size path
+      if path.end_with?('.icns')
+        context 'without use_display_pixels' do
+          test_image_size path
+        end
+
+        context 'with use_display_pixels' do
+          before{ ImageSize.use_display_pixels = true }
+          after{ ImageSize.use_display_pixels = nil }
+
+          test_image_size path do
+            let(:scale){ 1 }
+          end
+        end
+      else
+        test_image_size path
+      end
     end
   end
 

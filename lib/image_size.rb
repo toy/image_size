@@ -49,6 +49,9 @@ class ImageSize
       @dpi = dpi ? dpi.to_f : nil
     end
 
+    # Use display pixels instead of physical/image pixels for icns
+    attr_accessor :use_display_pixels
+
     # Size of chunk to use by IO and URI readers
     def chunk_size
       @chunk_size || 4096
@@ -130,6 +133,7 @@ private
     when head[0, 12] =~ /\ARIFF(?m:....)WEBP\z/                   then :webp
     when head[0, 4] == "\0\0\1\0"                                 then :ico
     when head[0, 4] == "\0\0\2\0"                                 then :cur
+    when head[0, 4] == 'icns'                                     then :icns
     when head[0, 12] == "\0\0\0\fjP  \r\n\207\n"                  then detect_jpeg2000_type(ir)
     when head[0, 4] == "\377O\377Q"                               then :j2c
     when head[0, 4] == "\1\0\0\0" && head[40, 4] == ' EMF'        then :emf
@@ -356,6 +360,60 @@ private
     ir.unpack(6, 2, 'CC').map{ |v| v.zero? ? 256 : v }
   end
   alias_method :size_of_cur, :size_of_ico
+
+  ICNS_16X12 = %w[icm# icm4 icm8].freeze
+  ICNS_SQUARE = {
+    [16, 1] => %w[ic04 icp4 ics# ics4 ics8 is32 s8mk],
+    [16, 2] => %w[ic11],
+    [18, 1] => %w[icsb],
+    [18, 2] => %w[icsB],
+    [24, 1] => %w[sb24],
+    [24, 2] => %w[SB24],
+    [32, 1] => %w[ICN# ICON ic05 icl4 icl8 icp5 il32 l8mk],
+    [32, 2] => %w[ic12],
+    [48, 1] => %w[h8mk ich# ich4 ich8 icp6 ih32],
+    [128, 1] => %w[ic07 it32 t8mk],
+    [128, 2] => %w[ic13],
+    [256, 1] => %w[ic08],
+    [256, 2] => %w[ic14],
+    [512, 1] => %w[ic09],
+    [512, 2] => %w[ic10],
+  }.each_with_object({}){ |(spec, types), h| types.each{ |type| h[type] = spec } }.freeze
+  private_constant :ICNS_16X12, :ICNS_SQUARE
+
+  def size_of_icns(ir)
+    file_length = ir.unpack1(4, 4, 'N')
+    offset = 8
+
+    types = []
+    while offset < file_length
+      type = ir[offset, 4]
+      length = ir.unpack1(offset + 4, 4, 'N')
+
+      case type
+      when 'TOC ' # rely on table of contents
+        fail FormatError, "TOC length #{length} is not divisible by 8" unless length % 8 == 0
+
+        types = (1...(length / 8)).map{ |i| ir[offset + (8 * i), 4] }
+        break
+      when 'icnV', 'info', 'name' # not icons
+      when 'slct', 'sbtp', "\375\331/\250" # nested icns
+      else
+        types << type
+      end
+
+      offset += length
+    end
+
+    types.map do |type|
+      next [16, 12] if ICNS_16X12.include?(type)
+
+      side, scale = ICNS_SQUARE[type]
+      fail FormatError, "unknown icon type: #{type.inspect}" unless side
+
+      (self.class.use_display_pixels ? [side] : [side * scale]) * 2
+    end.max
+  end
 
   def size_of_webp(ir)
     case ir.fetch(12, 4)
