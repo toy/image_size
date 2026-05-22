@@ -31,35 +31,37 @@ class ImageSize
     alias_method :h, :height
   end
 
-  # Given path to image finds its format, width and height
-  def self.path(path)
-    new(Pathname.new(path))
-  end
-
-  # Used for svg and emf
-  def self.dpi
-    @dpi || 72.0
-  end
-
-  # Used for svg and emf
-  def self.dpi=(dpi)
-    fail ArgumentError, "dpi should be nil or positive, got #{dpi}" unless dpi.nil? || dpi > 0
-
-    @dpi = dpi ? dpi.to_f : nil
-  end
-
-  # Size of chunk to use by IO and URI readers
-  def self.chunk_size
-    @chunk_size || 4096
-  end
-
-  # Set size of chunk to use by IO and URI readers
-  def self.chunk_size=(chunk_size)
-    unless chunk_size.nil? || (chunk_size.is_a?(Integer) && chunk_size > 0)
-      fail ArgumentError, "chunk_size should be a positive Integer or nil, got #{chunk_size}"
+  class << self
+    # Given path to image finds its format, width and height
+    def path(path)
+      new(Pathname.new(path))
     end
 
-    @chunk_size = chunk_size
+    # DPI used for svg and emf
+    def dpi
+      @dpi || 72.0
+    end
+
+    # Set DPI used for svg and emf
+    def dpi=(dpi)
+      fail ArgumentError, "dpi should be nil or positive, got #{dpi}" unless dpi.nil? || dpi > 0
+
+      @dpi = dpi ? dpi.to_f : nil
+    end
+
+    # Size of chunk to use by IO and URI readers
+    def chunk_size
+      @chunk_size || 4096
+    end
+
+    # Set size of chunk to use by IO and URI readers
+    def chunk_size=(chunk_size)
+      unless chunk_size.nil? || (chunk_size.is_a?(Integer) && chunk_size > 0)
+        fail ArgumentError, "chunk_size should be a positive Integer or nil, got #{chunk_size}"
+      end
+
+      @chunk_size = chunk_size
+    end
   end
 
   # Given image as any class responding to read and eof? or data as String, finds its format and dimensions
