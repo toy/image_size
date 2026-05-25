@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## v3.6.0 (2026-05-26)
+
 * Support `.icns` Apple Icon Image format [@toy](https://github.com/toy)
 
 ## v3.5.0 (2026-05-03)
