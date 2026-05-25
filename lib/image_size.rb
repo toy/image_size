@@ -108,6 +108,8 @@ private
 
   SVG_R = /<svg\b([^>]*)>/.freeze
   XML_R = /<\?xml|<!--/.freeze
+  private_constant :SVG_R, :XML_R
+
   def detect_format(ir)
     head = ir[0, 1024]
     case
@@ -192,6 +194,8 @@ private
     0xC9, 0xCA, 0xCB,
     0xCD, 0xCE, 0xCF
   ].freeze
+  private_constant :JPEG_CODE_CHECK
+
   def size_of_jpeg(ir)
     section_marker = "\xFF"
     offset = 2
@@ -370,6 +374,8 @@ private
     recurse: %w[jp2h],
     last: %w[jp2h]
   )
+  private_constant :JP2_WALKER
+
   def size_of_jp2(ir)
     JP2_WALKER.recurse(ir) do |box|
       return ir.unpack(box.data_offset, 8, 'NN').reverse if box.type == 'ihdr'
@@ -383,6 +389,7 @@ private
 
   EMF_UMAX = 256**4
   EMF_SMAX = EMF_UMAX / 2
+  private_constant :EMF_UMAX, :EMF_SMAX
 
   def size_of_emf(ir)
     left, top, right, bottom =
@@ -402,6 +409,8 @@ private
     full: %w[meta hdlr pitm ipma ispe],
     last: %w[meta]
   )
+  private_constant :HEIF_WALKER
+
   def size_of_heif(ir)
     pitm = nil
     ipma = nil
@@ -458,6 +467,4 @@ private
   end
   alias_method :size_of_avif, :size_of_heif
   alias_method :size_of_heic, :size_of_heif
-
-  private_constant :SVG_R, :XML_R, :JPEG_CODE_CHECK, :JP2_WALKER, :EMF_UMAX, :EMF_SMAX, :HEIF_WALKER
 end
