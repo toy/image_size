@@ -70,9 +70,7 @@ describe ImageSize do
     end
   end
 
-  Dir['spec/**/*'].each do |path|
-    next unless File.file?(path)
-
+  def self.test_image_size(path, &block)
     describe "for #{path}" do
       let(:name){ File.basename(path) }
       let(:attributes) do
@@ -98,6 +96,8 @@ describe ImageSize do
       end
       let(:file_data){ File.binread(path) }
       let(:file_size){ file_data.length }
+
+      instance_exec(&block) if block
 
       before do
         max_file_size = 16_384
@@ -266,6 +266,17 @@ describe ImageSize do
           end
         end
       end
+    end
+  end
+
+  context 'for non images' do
+    test_image_size 'spec/test_server.rb'
+    test_image_size 'spec/images/empty'
+  end
+
+  context 'for images' do
+    Dir['spec/images/*/*.*'].each do |path|
+      test_image_size path
     end
   end
 
