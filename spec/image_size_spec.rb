@@ -71,6 +71,10 @@ describe ImageSize do
   end
 
   def self.test_image_size(path, &block)
+    file_size = File.size(path)
+    max_file_size = 16_384
+    fail "reduce resulting gem size, #{path} is too big (#{file_size} > #{max_file_size})" if file_size > max_file_size
+
     describe "for #{path}" do
       let(:name){ File.basename(path) }
       let(:attributes) do
@@ -95,17 +99,8 @@ describe ImageSize do
         }
       end
       let(:file_data){ File.binread(path) }
-      let(:file_size){ file_data.length }
 
       instance_exec(&block) if block
-
-      before do
-        max_file_size = 16_384
-
-        if file_size > max_file_size
-          fail "reduce resulting gem size, #{path} is too big (#{file_size} > #{max_file_size})"
-        end
-      end
 
       context 'given as data' do
         it 'gets format and dimensions' do
