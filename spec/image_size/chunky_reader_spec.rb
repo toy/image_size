@@ -2,7 +2,7 @@
 
 require 'rspec'
 
-require 'image_size/chunky_reader'
+require 'image_size'
 
 describe ImageSize::ChunkyReader do
   context :[] do

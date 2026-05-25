@@ -2,7 +2,7 @@
 
 require 'rspec'
 
-require 'image_size/seekable_io_reader'
+require 'image_size'
 
 describe ImageSize::SeekableIOReader do
   context :[] do
